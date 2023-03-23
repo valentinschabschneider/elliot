@@ -1,0 +1,25 @@
+version: '3'
+services:
+  browserless:
+    image: browserless/chrome:1.58-puppeteer-19.7.5
+    environment:
+      DEBUG: browserless:*
+      MAX_CONCURRENT_SESSIONS: 10
+      CONNECTION_TIMEOUT: 60000
+      MAX_QUEUE_LENGTH: 20
+      PREBOOT_CHROME: true
+      DEMO_MODE: false
+      ENABLE_DEBUGGER: false
+      TOKEN: ${BROWSERLESS_TOKEN}
+      PORT: 3000
+      WORKSPACE_DELETE_EXPIRED: true
+
+  elliot:
+    image: valentinschabschneider/elliot:0.0.2
+    environment:
+      BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
+    ports:
+      - 3000:3000
+    depends_on:
+      - browserless
+    restart: unless-stopped
