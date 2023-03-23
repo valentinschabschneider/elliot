@@ -17,6 +17,7 @@ services:
   elliot:
     image: valentinschabschneider/elliot:0.0.2
     environment:
+      JWT_SECRET: ${JWT_SECRET}
       BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
     ports:
       - 3000:3000

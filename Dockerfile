@@ -1,9 +1,6 @@
 # Base image
 FROM node:19
 
-# Set default environment to production
-ENV NODE_ENV=production
-
 # Tell Puppeteer to skip installing Chrome, we'll be using the browserless/chrome
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
@@ -21,6 +18,9 @@ COPY . .
 
 # Creates a "dist" folder with the production build
 RUN yarn run build
+
+# Set default environment to production
+ENV NODE_ENV=production
 
 # Start the server using the production build
 CMD [ "yarn", "run", "start:prod" ]
