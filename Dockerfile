@@ -16,11 +16,11 @@ RUN yarn install
 # Bundle app source
 COPY . .
 
-# Creates a "dist" folder with the production build
-RUN yarn run build
-
 # Set default environment to production
 ENV NODE_ENV=production
+
+# Creates a "dist" folder with the production build
+RUN yarn run build
 
 # Start the server using the production build
 CMD [ "yarn", "run", "start:prod" ]
