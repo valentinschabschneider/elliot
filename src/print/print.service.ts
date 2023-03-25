@@ -21,8 +21,6 @@ export class PrintService {
     timeout: number,
     response: Response,
   ): Promise<StreamableFile> {
-    console.log(url, download, fileName, additionalScripts, timeout);
-
     if (download) {
       response.attachment(fileName);
     }

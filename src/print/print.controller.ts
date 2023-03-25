@@ -7,16 +7,18 @@ import {
   Res,
   StreamableFile,
   UseFilters,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { PrintService } from './print.service';
 import { ConditionalHtmlExceptionsFilter } from './conditionalHtml.exceptionFilter';
 import { PrintDto } from './printpdf.dto';
 import { JwtService } from '@nestjs/jwt';
+import { EnvironmentGuard } from '../environmentGuard.guard';
 
 @Controller('print')
 @ApiTags('print')
@@ -30,6 +32,8 @@ export class PrintController {
   @Get('pdf')
   @Header('Content-Type', 'application/pdf')
   @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseGuards(EnvironmentGuard('production'))
+  @ApiOperation({ summary: 'This endpoint is deactivated in production.' })
   async printPdf(
     @Res({ passthrough: true }) response: Response,
     @Query(new ValidationPipe({ transform: true }))
