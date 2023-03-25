@@ -1,26 +1,32 @@
-# Base image
-FROM node:19
+FROM node:19.0.0-alpine3.16 as build
 
-# Tell Puppeteer to skip installing Chrome, we'll be using the browserless/chrome
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-# Create app directory
 WORKDIR /usr/src/app
 
-# Copy both package.json AND yarn.lock
 COPY package.json yarn.lock ./
 
-# Install app dependencies
-RUN yarn install
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Bundle app source
+RUN yarn
+
 COPY . .
 
-# Set default environment to production
-ENV NODE_ENV=production
-
-# Creates a "dist" folder with the production build
 RUN yarn run build
 
-# Start the server using the production build
-CMD [ "yarn", "run", "start:prod" ]
+RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
+
+RUN rm -rf node_modules/rxjs/src/
+RUN rm -rf node_modules/rxjs/bundles/
+RUN rm -rf node_modules/rxjs/_esm5/
+RUN rm -rf node_modules/rxjs_esm2015/
+RUN rm -rf node_modules/swagger-ui-dist/*.map
+
+FROM gcr.io/distroless/nodejs18-debian11 as deploy
+
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+
+ENV NODE_ENV=production
+
+CMD ["dist/main.js"]
