@@ -10,30 +10,28 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
+import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
 import { PrintService } from './print.service';
-import { ConditionalHtmlExceptionsFilter } from './conditionalHtml.exceptionFilter';
-import { PrintDto } from './printpdf.dto';
-import { JwtService } from '@nestjs/jwt';
-import { EnvironmentGuard } from '../environmentGuard.guard';
+import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
+import { PrintDto } from './print.dto';
+import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
+import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 
 @Controller('print')
 @ApiTags('print')
 export class PrintController {
   constructor(
     private readonly printService: PrintService,
-    private configService: ConfigService,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Get('pdf')
   @Header('Content-Type', 'application/pdf')
+  @UseGuards(ApiKeyAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
-  @UseGuards(EnvironmentGuard('production'))
-  @ApiOperation({ summary: 'This endpoint is deactivated in production.' })
   async printPdf(
     @Res({ passthrough: true }) response: Response,
     @Query(new ValidationPipe({ transform: true }))
@@ -51,17 +49,12 @@ export class PrintController {
 
   @Get('pdf/:jwt')
   @Header('Content-Type', 'application/pdf')
+  @UseGuards(JwtParamAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
   async printJwtPdf(
     @Res({ passthrough: true }) response: Response,
     @Param('jwt') jwt: string,
   ): Promise<StreamableFile> {
-    const jwtSecret = this.configService.get<string>('JWT_SECRET');
-
-    if (jwtSecret) {
-      this.jwtService.verify(jwt, { secret: jwtSecret });
-    }
-
     const { url, download, additionalScripts, timeout, fileName } =
       Object.assign(new PrintDto(), this.jwtService.decode(jwt));
 

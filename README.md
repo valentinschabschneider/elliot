@@ -8,4 +8,4 @@ OpenAPI documentation can be accessed via http://localhost:3000/api with your br
 
 ## Error handling
 
-Set the header `x-json-error-response` to recieve errors as a JSON response.
+Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.

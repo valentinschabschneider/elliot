@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 import { PrintController } from './print.controller';
 import { PrintService } from './print.service';
 import configuration from './print.configuration';
-import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 
 @Module({
   imports: [

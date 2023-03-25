@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 
 import { PagedJsException } from './pagedjs.exception';
-import { PrinterOptions } from './printerOptions.interface';
+import { PrinterOptions } from './printer-options.interface';
 
 let Printer;
 
@@ -11,7 +11,7 @@ let Printer;
 export class PrintService {
   private readonly logger = new Logger(PrintService.name);
 
-  constructor(private configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) {}
 
   async generatePrintPdfResponse(
     url: string,
@@ -29,7 +29,7 @@ export class PrintService {
       await this.printPdf(url, {
         additionalScripts,
         timeout,
-        browserEndpoint: this.configService.get<string>('BROWSER_ENDPOINT'),
+        browserEndpoint: this.configService.get<string>('browserEndpoint'),
       }),
     );
   }

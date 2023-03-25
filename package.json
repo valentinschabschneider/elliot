@@ -1,9 +1,9 @@
 {
   "name": "elliot",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Elliot is a web service that converts HTML to PDFs with Paged.js.",
   "author": "Valentin Schabschneider",
-  "private": true,
+  "private": false,
   "license": "MIT",
   "scripts": {
     "build": "nest build",
@@ -24,12 +24,16 @@
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/jwt": "^10.0.2",
+    "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/serve-static": "^3.0.1",
     "@nestjs/swagger": "^6.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "pagedjs-cli": "^0.3.4",
+    "passport": "^0.6.0",
+    "passport-custom": "^1.1.1",
+    "passport-headerapikey": "^1.2.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
   },

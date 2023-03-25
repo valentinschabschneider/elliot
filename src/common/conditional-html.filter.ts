@@ -16,7 +16,7 @@ export class ConditionalHtmlExceptionsFilter implements ExceptionFilter {
     const status = exception.getStatus();
     response.status(status);
 
-    if (request.headers['x-json-error-response']) {
+    if (request.headers['x-json-error-response'] !== undefined) {
       response.contentType('application/json');
       response.json(exception.getResponse());
     } else {

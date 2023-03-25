@@ -1,4 +1,4 @@
-import { InternalServerErrorException, HttpStatus } from '@nestjs/common';
+import { InternalServerErrorException } from '@nestjs/common';
 
 export class PagedJsException extends InternalServerErrorException {
   constructor() {
