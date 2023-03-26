@@ -1,18 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 
+import { PagedjsModule } from '../pagedjs/pagedjs.module';
 import { PrintController } from './print.controller';
 import { PrintService } from './print.service';
-import configuration from './print.configuration';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      load: [configuration],
-    }),
-    JwtModule,
-  ],
+  imports: [JwtModule, PagedjsModule],
   controllers: [PrintController],
   providers: [PrintService],
 })
