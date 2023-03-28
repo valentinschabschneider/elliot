@@ -6,11 +6,11 @@ COPY package.json yarn.lock ./
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-RUN yarn
+RUN yarn install
 
 COPY . .
 
-RUN yarn run build
+RUN yarn build
 
 RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
 
@@ -29,4 +29,4 @@ COPY --from=build /usr/src/app/node_modules ./node_modules
 
 ENV NODE_ENV=production
 
-CMD ["dist/main.js"]
+CMD ["dist/main"]
