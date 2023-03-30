@@ -15,7 +15,7 @@ services:
       WORKSPACE_DELETE_EXPIRED: true
 
   elliot:
-    image: valentinschabschneider/elliot:0.0.2
+    image: valentinschabschneider/elliot:latest
     environment:
       JWT_SECRET: ${JWT_SECRET}
       BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}

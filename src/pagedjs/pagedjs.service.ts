@@ -14,10 +14,21 @@ export class PagedJsService {
   ) {}
 
   public createPrinter(printerOptions: PrinterOptions): Printer {
-    if (!printerOptions.browserEndpoint) {
-      printerOptions.browserEndpoint =
-        this.configService.get<string>('browserEndpoint');
-    }
+    printerOptions.browserEndpoint =
+      printerOptions.browserEndpoint ??
+      this.configService.get<string>('browserEndpoint');
+
+    const timeout = Math.min(
+      ...[
+        printerOptions.timeout,
+        this.configService.get<number>('maxTimeout'),
+      ].filter(Number.isFinite),
+    );
+
+    printerOptions.timeout = timeout !== Infinity ? timeout : undefined;
+
+    printerOptions.debug =
+      printerOptions.debug ?? this.configService.get('debug') == 'true'; // doesn't just return boolean for some reason
 
     const printer = new this.CPrinter(printerOptions);
 
@@ -79,10 +90,11 @@ export class PagedJsService {
 
       // remove the pagedjs script so that it doesn't get executed again on the client
       await page.evaluate(() => {
-        const pagedjsScript = Array.from(
-          document.querySelectorAll('script'),
-        ).find((el) => el.innerHTML.includes('@license Paged.js'));
-        pagedjsScript.parentNode.removeChild(pagedjsScript);
+        const scripts = Array.from(
+          document.head.querySelectorAll('script'),
+        ).filter((script) => !script.hasAttribute('keep'));
+
+        scripts.forEach((script) => script.parentNode.removeChild(script));
       });
 
       const html = await page.content();

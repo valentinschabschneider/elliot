@@ -37,3 +37,4 @@ lerna-debug.log*
 # misc
 TODO.md
 .env
+vercel.json

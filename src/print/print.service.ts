@@ -1,6 +1,5 @@
 import { Injectable, Logger, StreamableFile } from '@nestjs/common';
 import { Response } from 'express';
-import { PrinterOptions } from 'pagedjs-cli';
 
 import { PagedJsService } from '../pagedjs/pagedjs.service';
 
@@ -23,20 +22,22 @@ export class PrintService {
     }
 
     return new StreamableFile(
-      await this.printPdf(url, {
-        additionalScripts,
-        timeout,
-      }),
+      await this.printPdf(url, additionalScripts, timeout),
     );
   }
 
   private async printPdf(
     url: string,
-    printerOptions: PrinterOptions,
+    additionalScripts: string[],
+    timeout: number,
   ): Promise<Uint8Array> {
     return this.pagedjsService.printPdf(
       url,
-      this.pagedjsService.createPrinter(printerOptions),
+      this.pagedjsService.createPrinter({
+        additionalScripts,
+        timeout,
+        closeAfter: true,
+      }),
     );
   }
 }
