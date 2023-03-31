@@ -10,15 +10,15 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { JwtService } from '@nestjs/jwt';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import { PrintService } from './print.service';
-import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { PrintDto } from './print.dto';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
+import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
+import { PrintDto } from './print.dto';
+import { PrintService } from './print.service';
 
 @Controller('print')
 @ApiTags('print')
@@ -35,7 +35,14 @@ export class PrintController {
   async printPdf(
     @Res({ passthrough: true }) response: Response,
     @Query(new ValidationPipe({ transform: true }))
-    { url, download, additionalScripts, timeout, fileName }: PrintDto,
+    {
+      url,
+      download,
+      additionalScripts,
+      timeout,
+      fileName,
+      injectPolyfill,
+    }: PrintDto,
   ): Promise<StreamableFile> {
     return await this.printService.generatePrintPdfResponse(
       url,
@@ -43,6 +50,7 @@ export class PrintController {
       fileName,
       additionalScripts,
       timeout,
+      injectPolyfill,
       response,
     );
   }
@@ -55,8 +63,14 @@ export class PrintController {
     @Res({ passthrough: true }) response: Response,
     @Param('jwt') jwt: string,
   ): Promise<StreamableFile> {
-    const { url, download, additionalScripts, timeout, fileName } =
-      Object.assign(new PrintDto(), this.jwtService.decode(jwt));
+    const {
+      url,
+      download,
+      additionalScripts,
+      timeout,
+      fileName,
+      injectPolyfill,
+    } = Object.assign(new PrintDto(), this.jwtService.decode(jwt));
 
     return await this.printService.generatePrintPdfResponse(
       url,
@@ -64,6 +78,7 @@ export class PrintController {
       fileName,
       additionalScripts,
       timeout,
+      injectPolyfill,
       response,
     );
   }

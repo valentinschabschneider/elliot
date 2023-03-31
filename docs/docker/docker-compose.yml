@@ -1,5 +1,18 @@
 version: '3'
 services:
+  elliot:
+    image: valentinschabschneider/elliot:latest
+    environment:
+      NODE_ENV: ${ENVIRONMENT}
+      ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
+      SECRET_KEY: ${SECRET_KEY}
+      BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
+    ports:
+      - 3000:3000
+    depends_on:
+      - browserless
+    restart: unless-stopped
+
   browserless:
     image: browserless/chrome:1.58-puppeteer-19.7.5
     environment:
@@ -13,14 +26,3 @@ services:
       TOKEN: ${BROWSERLESS_TOKEN}
       PORT: 3000
       WORKSPACE_DELETE_EXPIRED: true
-
-  elliot:
-    image: valentinschabschneider/elliot:latest
-    environment:
-      JWT_SECRET: ${JWT_SECRET}
-      BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
-    ports:
-      - 3000:3000
-    depends_on:
-      - browserless
-    restart: unless-stopped

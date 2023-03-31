@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { PrintDto } from '../print/print.dto'; // aaaaaaaaaaaaaaaaaaaaaaaaaaaaaah
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
+import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
+import { PreviewDto } from './preview.dto';
 import { PreviewService } from './preview.service';
 
 @Controller('preview')
@@ -29,12 +29,13 @@ export class PreviewController {
   @UseFilters(new ConditionalHtmlExceptionsFilter())
   async printPdf(
     @Query(new ValidationPipe({ transform: true }))
-    { url, additionalScripts, timeout }: PrintDto,
+    { url, additionalScripts, timeout, injectPolyfill }: PreviewDto,
   ): Promise<string> {
     return await this.previewService.generateHTML(
       url,
       additionalScripts,
       timeout,
+      injectPolyfill,
     );
   }
 
@@ -43,8 +44,8 @@ export class PreviewController {
   @UseGuards(JwtParamAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
   async getJwtHTML(@Param('jwt') jwt: string): Promise<string> {
-    const { url, additionalScripts, timeout } = Object.assign(
-      new PrintDto(),
+    const { url, additionalScripts, timeout, injectPolyfill } = Object.assign(
+      new PreviewDto(),
       this.jwtService.decode(jwt),
     );
 
@@ -52,6 +53,7 @@ export class PreviewController {
       url,
       additionalScripts,
       timeout,
+      injectPolyfill,
     );
   }
 }

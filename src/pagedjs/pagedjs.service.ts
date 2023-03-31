@@ -30,16 +30,25 @@ export class PagedJsService {
     printerOptions.debug =
       printerOptions.debug ?? this.configService.get('debug') == 'true'; // doesn't just return boolean for some reason
 
+    printerOptions.additionalScripts = [
+      ...(printerOptions.additionalScripts ?? []),
+      ...this.configService.get<string[]>('additionalScripts'),
+    ];
+
+    if (printerOptions.additionalScripts.length > 0) {
+      this.logger.log(
+        'Will inject additional scripts: ' + printerOptions.additionalScripts,
+      );
+    }
+
     const printer = new this.CPrinter(printerOptions);
 
     printer.on('page', (page) => {
       if (page.position === 0) {
         this.logger.log('Loaded');
-
-        this.logger.log('Rendering: Page ' + (page.position + 1));
-      } else {
-        this.logger.log('Rendering: Page ' + (page.position + 1));
       }
+
+      this.logger.debug(`Rendering page ${page.position + 1}`);
     });
 
     printer.on('rendered', (msg) => {
@@ -47,8 +56,7 @@ export class PagedJsService {
       this.logger.log('Generating');
     });
 
-    printer.on('postprocessing', (msg) => {
-      this.logger.log(msg);
+    printer.on('postprocessing', () => {
       this.logger.log('Generated');
       this.logger.log('Processing');
     });
@@ -60,7 +68,7 @@ export class PagedJsService {
     input: string | RenderInput,
     printer: Printer,
   ): Promise<Uint8Array> {
-    this.logger.log('Print: ' + input);
+    this.logger.log(`Generate pdf from ${input}`);
 
     try {
       const file = await printer.pdf(input, {
@@ -82,13 +90,17 @@ export class PagedJsService {
   public async generateHTML(
     input: string | RenderInput,
     printer: Printer,
+    addScriptContent: string,
   ): Promise<string> {
-    this.logger.log('Generate html: ' + input);
+    this.logger.log(`Generate html from ${input}`);
 
     try {
       const page = await printer.preview(input);
 
-      // remove the pagedjs script so that it doesn't get executed again on the client
+      this.logger.log('Generated');
+      this.logger.log('Processing');
+
+      // remove the scripts so that it doesn't get executed again on the client
       await page.evaluate(() => {
         const scripts = Array.from(
           document.head.querySelectorAll('script'),
@@ -97,9 +109,23 @@ export class PagedJsService {
         scripts.forEach((script) => script.parentNode.removeChild(script));
       });
 
+      await page.addStyleTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.css',
+      });
+
+      await page.addScriptTag({
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.js',
+      });
+
+      await page.addScriptTag({
+        content: addScriptContent,
+      });
+
       const html = await page.content();
 
       printer.close();
+
+      this.logger.log('Processed');
 
       return html;
     } catch (error) {

@@ -10,13 +10,13 @@ export class AuthService {
   ) {}
 
   public validateApiKey(apiKey: string) {
-    return this.configService.get<string>('apiKey') === apiKey;
+    return this.configService.get<string>('secretKey') === apiKey;
   }
 
   public validateJwt(jwt: string) {
     try {
       return this.jwtService.verify(jwt, {
-        secret: this.configService.get<string>('jwtSecret'),
+        secret: this.configService.get<string>('secretKey'),
       });
     } catch (e) {
       return false;

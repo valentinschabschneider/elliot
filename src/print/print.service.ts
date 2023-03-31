@@ -15,14 +15,17 @@ export class PrintService {
     fileName: string,
     additionalScripts: string[],
     timeout: number,
+    injectPolyfill: boolean,
     response: Response,
   ): Promise<StreamableFile> {
     if (download) {
       response.attachment(fileName);
+    } else {
+      response.setHeader('content-disposition', `filename="${fileName}"`);
     }
 
     return new StreamableFile(
-      await this.printPdf(url, additionalScripts, timeout),
+      await this.printPdf(url, additionalScripts, timeout, injectPolyfill),
     );
   }
 
@@ -30,6 +33,7 @@ export class PrintService {
     url: string,
     additionalScripts: string[],
     timeout: number,
+    injectPolyfill: boolean,
   ): Promise<Uint8Array> {
     return this.pagedjsService.printPdf(
       url,
@@ -37,6 +41,7 @@ export class PrintService {
         additionalScripts,
         timeout,
         closeAfter: true,
+        disableScriptInjection: !injectPolyfill,
       }),
     );
   }

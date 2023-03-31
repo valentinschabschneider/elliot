@@ -7,5 +7,8 @@ export default () => {
     browserEndpoint: get('BROWSERLESS_ENDPOINT').asString(),
     maxTimeout: get('MAX_TIMEOUT').required(isProduction).asIntPositive(),
     debug: get('DEBUG').default('false').asBool(),
+    additionalScripts: get('ADDITIONAL_SCRIPTS')
+      .default('[]')
+      .asJsonArray() as string[],
   };
 };
