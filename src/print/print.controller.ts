@@ -1,8 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
-  Header,
   Param,
+  Post,
   Query,
   Res,
   StreamableFile,
@@ -11,29 +12,31 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { PrintDto } from './print.dto';
-import { PrintService } from './print.service';
+import { GetPrintDto } from './dto/get-print.dto';
+import { PostPrintDto } from './dto/post-print.dto';
+import { PrintOutputType } from './print-output-type.enum';
+import { PrintServiceFactory } from './print.service.factory';
 
-@Controller('print')
+@Controller('print/:outputType/now')
 @ApiTags('print')
 export class PrintController {
   constructor(
-    private readonly printService: PrintService,
+    private readonly printServiceFactory: PrintServiceFactory,
     private readonly jwtService: JwtService,
   ) {}
 
-  @Get('pdf')
-  @Header('Content-Type', 'application/pdf')
+  @Get()
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
-  async printPdf(
+  async printNowWithParams(
     @Res({ passthrough: true }) response: Response,
+    @Param('outputType') outputType: PrintOutputType,
     @Query(new ValidationPipe({ transform: true }))
     {
       url,
@@ -42,9 +45,11 @@ export class PrintController {
       timeout,
       fileName,
       injectPolyfill,
-    }: PrintDto,
-  ): Promise<StreamableFile> {
-    return await this.printService.generatePrintPdfResponse(
+    }: GetPrintDto,
+  ): Promise<StreamableFile | string> {
+    const printService = this.printServiceFactory.create(outputType);
+
+    return await printService.print(
       url,
       download,
       fileName,
@@ -55,14 +60,45 @@ export class PrintController {
     );
   }
 
-  @Get('pdf/:jwt')
-  @Header('Content-Type', 'application/pdf')
+  @Post()
+  @UseGuards(ApiKeyAuthGuard)
+  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @ApiConsumes('text/html')
+  @ApiBody({})
+  async printNowWithParamsPost(
+    @Res({ passthrough: true }) response: Response,
+    @Param('outputType') outputType: PrintOutputType,
+    @Query(new ValidationPipe({ transform: true }))
+    {
+      download,
+      additionalScripts,
+      timeout,
+      fileName,
+      injectPolyfill,
+    }: PostPrintDto,
+    @Body() html: string,
+  ): Promise<StreamableFile | string> {
+    const printService = this.printServiceFactory.create(outputType);
+
+    return await printService.print(
+      { html },
+      download,
+      fileName,
+      additionalScripts,
+      timeout,
+      injectPolyfill,
+      response,
+    );
+  }
+
+  @Get(':jwt')
   @UseGuards(JwtParamAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
-  async printJwtPdf(
+  async printNowWithJwt(
     @Res({ passthrough: true }) response: Response,
+    @Param('outputType') outputType: PrintOutputType,
     @Param('jwt') jwt: string,
-  ): Promise<StreamableFile> {
+  ): Promise<StreamableFile | string> {
     const {
       url,
       download,
@@ -70,9 +106,11 @@ export class PrintController {
       timeout,
       fileName,
       injectPolyfill,
-    } = Object.assign(new PrintDto(), this.jwtService.decode(jwt));
+    } = Object.assign(new GetPrintDto(), this.jwtService.decode(jwt));
 
-    return await this.printService.generatePrintPdfResponse(
+    const printService = this.printServiceFactory.create(outputType);
+
+    return await printService.print(
       url,
       download,
       fileName,

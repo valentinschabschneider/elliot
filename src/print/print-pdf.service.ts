@@ -2,14 +2,15 @@ import { Injectable, Logger, StreamableFile } from '@nestjs/common';
 import { Response } from 'express';
 
 import { PagedJsService } from '../pagedjs/pagedjs.service';
+import { IPrintService } from './print.service.interface';
 
 @Injectable()
-export class PrintService {
-  private readonly logger = new Logger(PrintService.name);
+export class PrintPdfService implements IPrintService {
+  private readonly logger = new Logger(PrintPdfService.name);
 
   constructor(private readonly pagedjsService: PagedJsService) {}
 
-  async generatePrintPdfResponse(
+  async print(
     url: string,
     download: boolean,
     fileName: string,
@@ -19,10 +20,15 @@ export class PrintService {
     response: Response,
   ): Promise<StreamableFile> {
     if (download) {
-      response.attachment(fileName);
+      response.attachment(fileName ?? 'document.pdf');
     } else {
-      response.setHeader('content-disposition', `filename="${fileName}"`);
+      response.setHeader(
+        'Content-Disposition',
+        `filename="${fileName ?? 'document.pdf'}"`,
+      );
     }
+
+    response.contentType('application/pdf');
 
     return new StreamableFile(
       await this.printPdf(url, additionalScripts, timeout, injectPolyfill),

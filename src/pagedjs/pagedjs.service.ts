@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Printer, PrinterOptions, RenderInput } from 'pagedjs-cli';
+import { FrameAddScriptTagOptions, FrameAddStyleTagOptions } from 'puppeteer';
 
 import { PagedJsException } from './pagedjs.exception';
 
@@ -90,7 +91,8 @@ export class PagedJsService {
   public async generateHTML(
     input: string | RenderInput,
     printer: Printer,
-    addScriptContent: string,
+    additionalStylesAfter: FrameAddStyleTagOptions[] = [],
+    additionalScriptsAfter: FrameAddScriptTagOptions[] = [],
   ): Promise<string> {
     this.logger.log(`Generate html from ${input}`);
 
@@ -109,21 +111,18 @@ export class PagedJsService {
         scripts.forEach((script) => script.parentNode.removeChild(script));
       });
 
-      await page.addStyleTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.css',
-      });
+      for await (const style of additionalStylesAfter) {
+        await page.addStyleTag(style);
+      }
 
-      await page.addScriptTag({
-        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.js',
-      });
-
-      await page.addScriptTag({
-        content: addScriptContent,
-      });
+      for await (const script of additionalScriptsAfter) {
+        await page.addScriptTag(script);
+      }
 
       const html = await page.content();
 
-      printer.close();
+      await page.close();
+      await printer.close();
 
       this.logger.log('Processed');
 

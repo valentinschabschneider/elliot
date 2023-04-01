@@ -1,32 +1,31 @@
 import { readFileSync } from 'fs';
+import { join } from 'path';
 
 import { Injectable, Logger } from '@nestjs/common';
-
-import { join } from 'path';
-import { PagedJsService } from '../pagedjs/pagedjs.service';
+import { FrameAddScriptTagOptions, FrameAddStyleTagOptions } from 'puppeteer';
 
 @Injectable()
 export class PreviewService {
   private readonly logger = new Logger(PreviewService.name);
 
-  constructor(private readonly pagedjsService: PagedJsService) {}
+  constructor() {}
 
-  public async generateHTML(
-    url: string,
-    additionalScripts: string[],
-    timeout: number,
-    injectPolyfill: boolean,
-  ): Promise<string> {
-    return this.pagedjsService.generateHTML(
-      url,
-      this.pagedjsService.createPrinter({
-        additionalScripts,
-        timeout,
-        emulateMedia: 'screen',
-        closeAfter: false,
-        disableScriptInjection: !injectPolyfill,
-      }),
-      readFileSync(join(__dirname, 'browser-warning.js'), 'utf8'),
-    );
+  public getStyles(): FrameAddStyleTagOptions[] {
+    return [
+      {
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.css',
+      },
+    ];
+  }
+
+  public getScripts(): FrameAddScriptTagOptions[] {
+    return [
+      {
+        url: 'https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.5.0/toastify.min.js',
+      },
+      {
+        content: readFileSync(join(__dirname, 'browser-warning.js'), 'utf8'),
+      },
+    ];
   }
 }
