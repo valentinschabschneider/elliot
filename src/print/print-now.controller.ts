@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -18,14 +19,14 @@ import { Response } from 'express';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { GetPrintDto } from './dto/get-print.dto';
-import { PostPrintDto } from './dto/post-print.dto';
+import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
+import { PrintUrlRequiredDto } from './dto/print-url-required.dto';
 import { PrintOutputType } from './print-output-type.enum';
 import { PrintServiceFactory } from './print.service.factory';
 
 @Controller('print/:outputType/now')
-@ApiTags('print')
-export class PrintController {
+@ApiTags('print/now')
+export class PrintNowController {
   constructor(
     private readonly printServiceFactory: PrintServiceFactory,
     private readonly jwtService: JwtService,
@@ -45,7 +46,7 @@ export class PrintController {
       timeout,
       fileName,
       injectPolyfill,
-    }: GetPrintDto,
+    }: PrintUrlRequiredDto,
   ): Promise<StreamableFile | string> {
     const printService = this.printServiceFactory.create(outputType);
 
@@ -64,20 +65,31 @@ export class PrintController {
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
   @ApiConsumes('text/html')
-  @ApiBody({})
+  @ApiBody({ required: false })
   async printNowWithParamsPost(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
     @Query(new ValidationPipe({ transform: true }))
     {
+      url,
       download,
       additionalScripts,
       timeout,
       fileName,
       injectPolyfill,
-    }: PostPrintDto,
+    }: PrintUrlOptionalDto,
     @Body() html: string,
   ): Promise<StreamableFile | string> {
+    if (url === undefined && (html === undefined || html === '')) {
+      throw new BadRequestException(
+        'You have to set either url or html parameter.',
+      );
+    } else if (url !== undefined && html !== undefined && html !== '') {
+      throw new BadRequestException(
+        "You can't use both url and html parameters.",
+      );
+    }
+
     const printService = this.printServiceFactory.create(outputType);
 
     return await printService.print(
@@ -106,7 +118,7 @@ export class PrintController {
       timeout,
       fileName,
       injectPolyfill,
-    } = Object.assign(new GetPrintDto(), this.jwtService.decode(jwt));
+    } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
     const printService = this.printServiceFactory.create(outputType);
 
