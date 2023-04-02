@@ -1,6 +1,6 @@
 import { Injectable, NotImplementedException } from '@nestjs/common';
-import { PreviewService } from 'src/preview/preview.service';
 import { PagedJsService } from '../pagedjs/pagedjs.service';
+import { PreviewService } from '../preview/preview.service';
 import { PrintHtmlService } from './print-html.service';
 import { PrintOutputType } from './print-output-type.enum';
 import { PrintPdfService } from './print-pdf.service';
