@@ -1,14 +1,18 @@
-import { StreamableFile } from '@nestjs/common';
 import { Response } from 'express';
+import { PrintStep } from 'src/pagedjs/print-step.enum';
 
 export interface IPrintService {
   print(
     input: string | { url?: string; html?: string },
-    download: boolean,
-    fileName: string,
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
+    currentStepCallback: (step: PrintStep) => void,
+  ): Promise<any>;
+  createResponse(
+    data: any,
+    download: boolean,
+    fileName: string,
     response: Response,
-  ): Promise<StreamableFile | string>;
+  ): any;
 }

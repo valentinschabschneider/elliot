@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   Param,
   Post,
   Query,
@@ -19,15 +20,19 @@ import { Response } from 'express';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
+import { PrintQueueService } from '../queue/print-queue.service';
+import { PrintOutputType } from '../whatever/print-output-type.enum'; // TODO: dont konw if it should be here, mabye common
+import { PrintServiceFactory } from '../whatever/print.service.factory';
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 import { PrintUrlRequiredDto } from './dto/print-url-required.dto';
-import { PrintOutputType } from './print-output-type.enum';
-import { PrintServiceFactory } from './print.service.factory';
+
+const PRIORITY = 2;
 
 @Controller('print/:outputType/now')
 @ApiTags('print/now')
 export class PrintNowController {
   constructor(
+    private readonly printQueueService: PrintQueueService,
     private readonly printServiceFactory: PrintServiceFactory,
     private readonly jwtService: JwtService,
   ) {}
@@ -48,17 +53,30 @@ export class PrintNowController {
       injectPolyfill,
     }: PrintUrlRequiredDto,
   ): Promise<StreamableFile | string> {
+    const job = await this.printQueueService.addPrintJob(
+      {
+        input: { url },
+        outputType,
+        additionalScripts,
+        timeout,
+        injectPolyfill,
+      },
+      PRIORITY,
+    );
+
+    await job.finished();
+
+    if (await job.isFailed()) {
+      throw new InternalServerErrorException(job.failedReason);
+    }
+
     const printService = this.printServiceFactory.create(outputType);
 
-    return await printService.print(
-      url,
-      download,
-      fileName,
-      additionalScripts,
-      timeout,
-      injectPolyfill,
-      response,
-    );
+    const jobResult = await this.printQueueService.getPrintJobResult(
+      job.id.toString(),
+    ); // TODO: use job instead of job.id.toString()
+
+    return printService.createResponse(jobResult, download, fileName, response);
   }
 
   @Post()
@@ -80,27 +98,48 @@ export class PrintNowController {
     }: PrintUrlOptionalDto,
     @Body() html: string,
   ): Promise<StreamableFile | string> {
-    if (url === undefined && (html === undefined || html === '')) {
+    if (url === undefined && (typeof html !== 'string' || html === '')) {
       throw new BadRequestException(
         'You have to set either url or html parameter.',
       );
-    } else if (url !== undefined && html !== undefined && html !== '') {
-      throw new BadRequestException(
-        "You can't use both url and html parameters.",
-      );
+    } else if (url !== undefined) {
+      if (typeof html === 'string' && html !== '') {
+        throw new BadRequestException(
+          "You can't use both url and html parameters.",
+        );
+      } else {
+        html = undefined;
+      }
+    }
+
+    //
+    // TODO: remove duplicate code
+    //
+
+    const job = await this.printQueueService.addPrintJob(
+      {
+        input: { url, html },
+        outputType,
+        additionalScripts,
+        timeout,
+        injectPolyfill,
+      },
+      PRIORITY,
+    );
+
+    await job.finished();
+
+    if (await job.isFailed()) {
+      throw new InternalServerErrorException(job.failedReason);
     }
 
     const printService = this.printServiceFactory.create(outputType);
 
-    return await printService.print(
-      { html },
-      download,
-      fileName,
-      additionalScripts,
-      timeout,
-      injectPolyfill,
-      response,
-    );
+    const jobResult = await this.printQueueService.getPrintJobResult(
+      job.id.toString(),
+    ); // TODO: use job instead of job.id.toString()
+
+    return printService.createResponse(jobResult, download, fileName, response);
   }
 
   @Get(':jwt')
@@ -120,16 +159,33 @@ export class PrintNowController {
       injectPolyfill,
     } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
+    //
+    // TODO: remove duplicate code
+    //
+
+    const job = await this.printQueueService.addPrintJob(
+      {
+        input: { url },
+        outputType,
+        additionalScripts,
+        timeout,
+        injectPolyfill,
+      },
+      PRIORITY,
+    );
+
+    await job.finished();
+
+    if (await job.isFailed()) {
+      throw new InternalServerErrorException(job.failedReason);
+    }
+
     const printService = this.printServiceFactory.create(outputType);
 
-    return await printService.print(
-      url,
-      download,
-      fileName,
-      additionalScripts,
-      timeout,
-      injectPolyfill,
-      response,
-    );
+    const jobResult = await this.printQueueService.getPrintJobResult(
+      job.id.toString(),
+    ); // TODO: use job instead of job.id.toString()
+
+    return printService.createResponse(jobResult, download, fileName, response);
   }
 }
