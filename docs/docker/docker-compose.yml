@@ -4,6 +4,8 @@ services:
     image: valentinschabschneider/elliot:0.2.0
     environment:
       NODE_ENV: ${ENVIRONMENT}
+      MAX_TIMEOUT: ${MAX_TIMEOUT}
+      PERSIST_PERIOD: ${PERSIST_PERIOD}
       ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
       SECRET_KEY: ${SECRET_KEY}
       BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}

@@ -1,9 +1,10 @@
 import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 
-import { Cron } from '@nestjs/schedule';
 import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
 import { JobProgress } from './job-progress.enum';
 import { JobReturnValue } from './job-return-value.interface';
@@ -12,7 +13,10 @@ import { JobReturnValue } from './job-return-value.interface';
 export class PrintQueueService {
   private readonly logger = new Logger(PrintQueueService.name);
 
-  constructor(@InjectQueue('print') private queue: Queue) {}
+  constructor(
+    @InjectQueue('print') private queue: Queue,
+    private readonly configService: ConfigService,
+  ) {}
 
   public async addPrintJob(
     options: PrintOptions,
@@ -45,9 +49,12 @@ export class PrintQueueService {
     return job.returnvalue;
   }
 
-  @Cron('0 0 * * * *')
+  @Cron('0 * * * * *')
   handleCron() {
     this.logger.debug('Clean queue');
-    this.queue.clean(3600 * 1000, 'completed');
+    this.queue.clean(
+      this.configService.get<number>('persistPeriod'),
+      'completed',
+    );
   }
 }
