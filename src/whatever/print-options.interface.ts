@@ -1,7 +1,7 @@
 import { PrintInput } from './print-input.interface';
 import { PrintOutputType } from './print-output-type.enum';
 
-export class PrintOptionsModel {
+export interface PrintOptions {
   input: PrintInput;
   outputType: PrintOutputType;
   additionalScripts: string[];

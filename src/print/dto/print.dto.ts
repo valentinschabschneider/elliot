@@ -1,8 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsOptional, IsPositive } from 'class-validator';
+import { CollectDto } from './collect.dto';
 
-export class PrintDto {
+// that extends is traaaaash
+export class PrintDto extends CollectDto {
   @IsArray()
   @Transform(({ value }) =>
     Array.isArray(value) ? value : value === undefined ? [] : [value],
@@ -29,16 +31,4 @@ export class PrintDto {
     default: true,
   })
   injectPolyfill: boolean = true;
-  @Transform(({ value }) => value === 'true')
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'File will be downloaded. Otherwise streamed.',
-    default: true,
-  })
-  download: boolean = true;
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'The file name when downloaded.',
-  })
-  fileName?: string;
 }

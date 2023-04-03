@@ -8,7 +8,6 @@ import {
   Post,
   Query,
   Res,
-  StreamableFile,
   UseFilters,
   UseGuards,
   ValidationPipe,
@@ -21,8 +20,8 @@ import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
 import { PrintQueueService } from '../queue/print-queue.service';
+import { PrintOptions } from '../whatever/print-options.interface';
 import { PrintOutputType } from '../whatever/print-output-type.enum'; // TODO: dont konw if it should be here, mabye common
-import { PrintServiceFactory } from '../whatever/print.service.factory';
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 import { PrintUrlRequiredDto } from './dto/print-url-required.dto';
 
@@ -33,13 +32,12 @@ const PRIORITY = 2;
 export class PrintNowController {
   constructor(
     private readonly printQueueService: PrintQueueService,
-    private readonly printServiceFactory: PrintServiceFactory,
     private readonly jwtService: JwtService,
   ) {}
 
   @Get()
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseFilters(ConditionalHtmlExceptionsFilter)
   async printNowWithParams(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
@@ -52,8 +50,8 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
     }: PrintUrlRequiredDto,
-  ): Promise<StreamableFile | string> {
-    const job = await this.printQueueService.addPrintJob(
+  ) {
+    return this.doStuff(
       {
         input: { url },
         outputType,
@@ -62,26 +60,15 @@ export class PrintNowController {
         injectPolyfill,
       },
       PRIORITY,
+      response,
+      download,
+      fileName,
     );
-
-    await job.finished();
-
-    if (await job.isFailed()) {
-      throw new InternalServerErrorException(job.failedReason);
-    }
-
-    const printService = this.printServiceFactory.create(outputType);
-
-    const jobResult = await this.printQueueService.getPrintJobResult(
-      job.id.toString(),
-    ); // TODO: use job instead of job.id.toString()
-
-    return printService.createResponse(jobResult, download, fileName, response);
   }
 
   @Post()
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
   @ApiBody({ required: false })
   async printNowWithParamsPost(
@@ -97,7 +84,7 @@ export class PrintNowController {
       injectPolyfill,
     }: PrintUrlOptionalDto,
     @Body() html: string,
-  ): Promise<StreamableFile | string> {
+  ) {
     if (url === undefined && (typeof html !== 'string' || html === '')) {
       throw new BadRequestException(
         'You have to set either url or html parameter.',
@@ -112,44 +99,29 @@ export class PrintNowController {
       }
     }
 
-    //
-    // TODO: remove duplicate code
-    //
-
-    const job = await this.printQueueService.addPrintJob(
+    return this.doStuff(
       {
-        input: { url, html },
+        input: { url },
         outputType,
         additionalScripts,
         timeout,
         injectPolyfill,
       },
       PRIORITY,
+      response,
+      download,
+      fileName,
     );
-
-    await job.finished();
-
-    if (await job.isFailed()) {
-      throw new InternalServerErrorException(job.failedReason);
-    }
-
-    const printService = this.printServiceFactory.create(outputType);
-
-    const jobResult = await this.printQueueService.getPrintJobResult(
-      job.id.toString(),
-    ); // TODO: use job instead of job.id.toString()
-
-    return printService.createResponse(jobResult, download, fileName, response);
   }
 
   @Get(':jwt')
   @UseGuards(JwtParamAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseFilters(ConditionalHtmlExceptionsFilter)
   async printNowWithJwt(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
     @Param('jwt') jwt: string,
-  ): Promise<StreamableFile | string> {
+  ) {
     const {
       url,
       download,
@@ -159,11 +131,7 @@ export class PrintNowController {
       injectPolyfill,
     } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
-    //
-    // TODO: remove duplicate code
-    //
-
-    const job = await this.printQueueService.addPrintJob(
+    return this.doStuff(
       {
         input: { url },
         outputType,
@@ -172,20 +140,31 @@ export class PrintNowController {
         injectPolyfill,
       },
       PRIORITY,
+      response,
+      download,
+      fileName,
     );
+  }
 
-    await job.finished();
+  // put somewhere it makes sense, some service
+  private async doStuff(
+    options: PrintOptions,
+    priority: number,
+    response: Response,
+    download: boolean,
+    fileName: string,
+  ) {
+    const job = await this.printQueueService.addPrintJob(options, priority);
 
-    if (await job.isFailed()) {
-      throw new InternalServerErrorException(job.failedReason);
+    try {
+      await job.finished();
+    } catch (e) {
+      throw new InternalServerErrorException(e.message);
     }
 
-    const printService = this.printServiceFactory.create(outputType);
-
-    const jobResult = await this.printQueueService.getPrintJobResult(
-      job.id.toString(),
-    ); // TODO: use job instead of job.id.toString()
-
-    return printService.createResponse(jobResult, download, fileName, response);
+    return response.redirect(
+      `/collect/${job.id}?download=${download}` +
+        (fileName !== undefined ? `&fileName=${fileName}` : ''), // TODO: make better
+    );
   }
 }

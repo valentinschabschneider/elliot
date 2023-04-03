@@ -6,14 +6,11 @@ import {
   Param,
   Post,
   Query,
-  Res,
-  StreamableFile,
   UseFilters,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
@@ -35,7 +32,7 @@ export class PrintSoonController {
 
   @Post()
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
   @ApiBody({ required: false })
   async printNowWithParamsPost(
@@ -74,27 +71,10 @@ export class PrintSoonController {
 
   @Get(':jobId')
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @UseFilters(ConditionalHtmlExceptionsFilter)
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
     const jobProgress = await this.queueService.getPrintJobProgress(jobId);
 
     return { progress: jobProgress };
-  }
-
-  @Get(':jobId/collect')
-  @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(new ConditionalHtmlExceptionsFilter())
-  async getJobResult(
-    @Res({ passthrough: true }) response: Response,
-    @Param('outputType') outputType: PrintOutputType,
-    @Param('jobId') jobId: string,
-    @Query(new ValidationPipe({ transform: true }))
-    { download, fileName }: PrintUrlOptionalDto,
-  ): Promise<StreamableFile | string> {
-    const jobResult = await this.queueService.getPrintJobResult(jobId);
-
-    const printService = this.printServiceFactory.create(outputType);
-
-    return printService.createResponse(jobResult, download, fileName, response);
   }
 }

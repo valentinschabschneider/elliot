@@ -1,10 +1,12 @@
 import { InjectQueue } from '@nestjs/bull';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Job, Queue } from 'bull';
+import { v4 as uuid } from 'uuid';
 
 import { Cron } from '@nestjs/schedule';
-import { PrintOptionsModel } from '../whatever/print-options.model'; // TODO: mabye put somewhere else
+import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
 import { JobProgress } from './job-progress.enum';
+import { JobReturnValue } from './job-return-value.interface';
 
 @Injectable()
 export class PrintQueueService {
@@ -13,10 +15,11 @@ export class PrintQueueService {
   constructor(@InjectQueue('print') private queue: Queue) {}
 
   public async addPrintJob(
-    options: PrintOptionsModel,
+    options: PrintOptions,
     priority: number,
   ): Promise<Job> {
     const job = await this.queue.add(options, {
+      jobId: uuid(),
       priority,
       attempts: 1,
     });
@@ -32,7 +35,7 @@ export class PrintQueueService {
     return job.progress();
   }
 
-  public async getPrintJobResult(id: string): Promise<any> {
+  public async getPrintJobResult(id: string): Promise<JobReturnValue> {
     const job = await this.queue.getJob(id);
 
     if (!(await job.isCompleted())) {
