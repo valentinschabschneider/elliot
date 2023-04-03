@@ -18,7 +18,7 @@ export class PrintPdfService implements IPrintService {
     timeout: number,
     injectPolyfill: boolean,
     currentStepCallback: (step: PrintStep) => void,
-  ): Promise<Uint8Array> {
+  ): Promise<Array<number>> {
     const file = await this.pagedjsService.printPdf(
       input,
       this.pagedjsService.createPrinter(
@@ -33,7 +33,7 @@ export class PrintPdfService implements IPrintService {
       currentStepCallback,
     );
 
-    return file;
+    return Array.from(file);
   }
 
   public createResponse(
@@ -53,8 +53,6 @@ export class PrintPdfService implements IPrintService {
 
     response.contentType('application/pdf');
 
-    const file = new Uint8Array(Object.values(data)); // This hack is horrible.
-
-    return new StreamableFile(file);
+    return new StreamableFile(Uint8Array.from(data));
   }
 }
