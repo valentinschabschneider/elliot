@@ -34,7 +34,7 @@ async function bootstrap() {
     const serverAdapter = new ExpressAdapter();
     serverAdapter.setBasePath('/bull-board');
     createBullBoard({
-      queues: [new BullMQAdapter(app.get<Queue>(`BullQueue_print`))],
+      queues: [new BullMQAdapter(app.get<Queue>(`BullQueue_printer`))],
       serverAdapter,
     });
     app.use('/bull-board', serverAdapter.getRouter());

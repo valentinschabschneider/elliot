@@ -6,7 +6,6 @@ import { Job, Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 
 import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
-import { JobProgress } from './job-progress.enum';
 import { JobReturnValue } from './job-return-value.interface';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class PrintQueueService {
   private readonly logger = new Logger(PrintQueueService.name);
 
   constructor(
-    @InjectQueue('print') private queue: Queue,
+    @InjectQueue('printer') private queue: Queue,
     private readonly configService: ConfigService,
   ) {}
 
@@ -22,21 +21,19 @@ export class PrintQueueService {
     options: PrintOptions,
     priority: number,
   ): Promise<Job> {
-    const job = await this.queue.add(options, {
+    const job = await this.queue.add('print', options, {
       jobId: uuid(),
       priority,
       attempts: 1,
     });
 
-    job.progress(JobProgress.QUEUED);
-
     return job;
   }
 
-  public async getPrintJobProgress(id: string): Promise<JobProgress> {
+  public async getPrintJob(id: string): Promise<Job> {
     const job = await this.queue.getJob(id);
 
-    return job.progress();
+    return job;
   }
 
   public async getPrintJobResult(id: string): Promise<JobReturnValue> {
@@ -51,7 +48,7 @@ export class PrintQueueService {
 
   @Cron('0 * * * * *')
   handleCron() {
-    this.logger.debug('Clean queue');
+    this.logger.log('Clean queue');
     this.queue.clean(
       this.configService.get<number>('persistPeriod'),
       'completed',

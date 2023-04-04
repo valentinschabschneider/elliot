@@ -1,5 +1,4 @@
 export enum JobProgress {
-  QUEUED = 'queued',
   LOADING = 'loading',
   RENDERING = 'rendering',
   GENERATING = 'generating',

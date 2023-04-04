@@ -31,4 +31,24 @@ export class PrintDto extends CollectDto {
     default: true,
   })
   injectPolyfill: boolean = true;
+  @IsArray()
+  @Transform(({ value }) => {
+    const headers: string[] = Array.isArray(value)
+      ? value
+      : value === undefined
+      ? []
+      : [value];
+
+    return headers.reduce((acc, header) => {
+      const [name, ...value] = header.split(':');
+      return [...acc, { [name]: value.join(':') }];
+    }, []);
+  })
+  @IsOptional()
+  @Expose({ name: 'extraHttpHeader' })
+  @ApiPropertyOptional({
+    description: 'Additional scripts to load.',
+    default: [],
+  })
+  extraHttpHeaders?: Record<string, string>[];
 }

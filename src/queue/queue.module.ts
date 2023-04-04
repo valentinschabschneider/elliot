@@ -9,7 +9,7 @@ import { QueueConsumer } from './queue.consumer';
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: 'print',
+      name: 'printer',
     }),
     WhateverModule,
     ConfigModule.forRoot({

@@ -18,17 +18,13 @@ import { PrintQueueService } from '../queue/print-queue.service';
 import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
 import { PrintOutputType } from '../whatever/print-output-type.enum';
-import { PrintServiceFactory } from '../whatever/print.service.factory';
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 
 const PRIORITY = 1;
 @Controller('print/:outputType/soon')
 @ApiTags('print/soon')
 export class PrintSoonController {
-  constructor(
-    private readonly queueService: PrintQueueService,
-    private readonly printServiceFactory: PrintServiceFactory,
-  ) {}
+  constructor(private readonly queueService: PrintQueueService) {}
 
   @Post()
   @UseGuards(ApiKeyAuthGuard)
@@ -38,7 +34,13 @@ export class PrintSoonController {
   async printNowWithParamsPost(
     @Param('outputType') outputType: PrintOutputType,
     @Query(new ValidationPipe({ transform: true }))
-    { url, additionalScripts, timeout, injectPolyfill }: PrintUrlOptionalDto,
+    {
+      url,
+      additionalScripts,
+      timeout,
+      injectPolyfill,
+      extraHttpHeaders,
+    }: PrintUrlOptionalDto,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
     if (url === undefined && (typeof html !== 'string' || html === '')) {
@@ -62,6 +64,7 @@ export class PrintSoonController {
         additionalScripts,
         timeout,
         injectPolyfill,
+        extraHttpHeaders,
       },
       PRIORITY,
     );
@@ -73,8 +76,15 @@ export class PrintSoonController {
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
-    const jobProgress = await this.queueService.getPrintJobProgress(jobId);
+    const job = await this.queueService.getPrintJob(jobId);
 
-    return { progress: jobProgress };
+    return {
+      state: job.isActive()
+        ? job.progress() == 0
+          ? 'starting'
+          : job.progress()
+        : job.getState(),
+      error: job.failedReason,
+    }; // TODO: make better
   }
 }

@@ -7,4 +7,5 @@ export interface PrintOptions {
   additionalScripts: string[];
   timeout: number;
   injectPolyfill: boolean;
+  extraHttpHeaders: Record<string, string>[];
 }
