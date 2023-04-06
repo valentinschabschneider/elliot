@@ -9,11 +9,19 @@ services:
       QUEUE_CONCURRENCY: ${QUEUE_CONCURRENCY}
       ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
       SECRET_KEY: ${SECRET_KEY}
+      REDIS_URL: redis://redis:6379
       BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
     ports:
       - 3000:3000
     depends_on:
+      - redis
       - browserless
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    volumes:
+      - redis-data:/data
     restart: unless-stopped
 
   browserless:
@@ -27,12 +35,6 @@ services:
       ENABLE_DEBUGGER: false
       WORKSPACE_DELETE_EXPIRED: true
       TOKEN: ${BROWSERLESS_TOKEN}
-    restart: unless-stopped
-
-  redis:
-    image: redis:6.2-alpine
-    volumes:
-      - redis-data:/data
     restart: unless-stopped
 
 volumes:

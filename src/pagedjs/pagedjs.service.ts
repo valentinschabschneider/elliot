@@ -19,6 +19,7 @@ export class PagedJsService {
     printerOptions: PrinterOptions,
     currentStepCallback: (step: PrintStep) => void,
   ): Printer {
+    // TODO: move to function
     printerOptions.browserEndpoint =
       printerOptions.browserEndpoint ??
       this.configService.get<string>('browserEndpoint');
@@ -42,11 +43,22 @@ export class PagedJsService {
 
     if (printerOptions.additionalScripts.length > 0) {
       this.logger.log(
-        'Will inject additional scripts: ' + printerOptions.additionalScripts,
+        'Will inject additional scripts: ' +
+          JSON.stringify(printerOptions.additionalScripts),
       );
     }
 
-    // TODO: merge headers arrays
+    printerOptions.extraHttpHeaders = [
+      ...(printerOptions.extraHttpHeaders ?? []),
+      ...this.configService.get<string[]>('httpHeaders'),
+    ];
+
+    if (printerOptions.extraHttpHeaders.length > 0) {
+      this.logger.log(
+        'Will add http headers: ' +
+          JSON.stringify(printerOptions.extraHttpHeaders),
+      );
+    }
 
     const printer = new this.CPrinter(printerOptions);
 

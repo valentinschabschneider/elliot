@@ -4,6 +4,7 @@ import { join } from 'path';
 
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
+import { get } from 'env-var';
 import { AuthModule } from './auth/auth.module';
 import { PagedjsModule } from './pagedjs/pagedjs.module';
 import { PreviewModule } from './preview/preview.module';
@@ -27,9 +28,11 @@ import { WhateverModule } from './whatever/whatever.module';
     PagedjsModule,
     BullModule.forRoot({
       redis: {
-        host: 'localhost', // TODO: make this configurable
-        port: 6379,
-      },
+        host: get('REDIS_URL').required().asUrlObject().hostname,
+        password: get('REDIS_URL').required().asUrlObject().password,
+        port: Number(get('REDIS_URL').required().asUrlObject().port),
+        username: get('REDIS_URL').required().asUrlObject().username,
+      }, // TODO: better?
     }),
     QueueModule,
     WhateverModule,
