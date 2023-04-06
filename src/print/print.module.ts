@@ -1,22 +1,14 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
-import { PagedjsModule } from '../pagedjs/pagedjs.module';
-import { PreviewModule } from '../preview/preview.module';
-import { PreviewService } from '../preview/preview.service';
-import { PrintHtmlService } from './print-html.service';
-import { PrintPdfService } from './print-pdf.service';
-import { PrintController } from './print.controller';
-import { PrintServiceFactory } from './print.service.factory';
+import { WhateverModule } from 'src/whatever/whatever.module';
+import { QueueModule } from '../queue/queue.module';
+import { CollectController } from './collect.controller';
+import { PrintNowController } from './print-now.controller';
+import { PrintSoonController } from './print-soon.controller';
 
 @Module({
-  imports: [JwtModule, PagedjsModule, PreviewModule],
-  controllers: [PrintController],
-  providers: [
-    PrintServiceFactory,
-    PrintPdfService,
-    PrintHtmlService,
-    PreviewService,
-  ],
+  imports: [JwtModule, QueueModule, WhateverModule],
+  controllers: [PrintNowController, PrintSoonController, CollectController],
 })
 export class PrintModule {}

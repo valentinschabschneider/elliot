@@ -1,28 +1,41 @@
 version: '3'
 services:
   elliot:
-    image: valentinschabschneider/elliot:latest
+    image: valentinschabschneider/elliot:0.2.0
     environment:
       NODE_ENV: ${ENVIRONMENT}
+      MAX_TIMEOUT: ${MAX_TIMEOUT}
+      PERSIST_PERIOD: ${PERSIST_PERIOD}
+      QUEUE_CONCURRENCY: ${QUEUE_CONCURRENCY}
       ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
       SECRET_KEY: ${SECRET_KEY}
+      REDIS_URL: redis://redis:6379
       BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
     ports:
       - 3000:3000
     depends_on:
+      - redis
       - browserless
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    volumes:
+      - redis-data:/data
     restart: unless-stopped
 
   browserless:
     image: browserless/chrome:1.58-puppeteer-19.7.5
     environment:
-      DEBUG: browserless:*
       MAX_CONCURRENT_SESSIONS: 10
       CONNECTION_TIMEOUT: 60000
       MAX_QUEUE_LENGTH: 20
       PREBOOT_CHROME: true
       DEMO_MODE: false
       ENABLE_DEBUGGER: false
-      TOKEN: ${BROWSERLESS_TOKEN}
-      PORT: 3000
       WORKSPACE_DELETE_EXPIRED: true
+      TOKEN: ${BROWSERLESS_TOKEN}
+    restart: unless-stopped
+
+volumes:
+  redis-data:

@@ -5,11 +5,16 @@ services:
     build: .
     environment:
       NODE_ENV: development
+      REDIS_URL: redis://redis:6379
       BROWSERLESS_ENDPOINT: ws://browserless:3000
     ports:
       - 3000:3000
     depends_on:
+      - redis
       - browserless
+
+  redis:
+    image: redis:6.2-alpine
 
   browserless:
     image: browserless/chrome:1.58-puppeteer-19.7.5

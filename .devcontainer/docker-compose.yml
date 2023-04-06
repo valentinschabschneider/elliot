@@ -5,6 +5,8 @@ services:
       target: base
       args:
         NODE_BASE_IMAGE: node:19
+    environment:
+      CHOKIDAR_USEPOLLING: true
     volumes:
       - .:/usr/src/app:cached
       - /usr/src/app/node_modules

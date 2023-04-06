@@ -4,6 +4,7 @@ import type { Printer, PrinterOptions, RenderInput } from 'pagedjs-cli';
 import { FrameAddScriptTagOptions, FrameAddStyleTagOptions } from 'puppeteer';
 
 import { PagedJsException } from './pagedjs.exception';
+import { PrintStep } from './print-step.enum';
 
 @Injectable()
 export class PagedJsService {
@@ -14,7 +15,11 @@ export class PagedJsService {
     @Inject('PRINTER') private readonly CPrinter: typeof Printer,
   ) {}
 
-  public createPrinter(printerOptions: PrinterOptions): Printer {
+  public createPrinter(
+    printerOptions: PrinterOptions,
+    currentStepCallback: (step: PrintStep) => void,
+  ): Printer {
+    // TODO: move to function
     printerOptions.browserEndpoint =
       printerOptions.browserEndpoint ??
       this.configService.get<string>('browserEndpoint');
@@ -38,7 +43,20 @@ export class PagedJsService {
 
     if (printerOptions.additionalScripts.length > 0) {
       this.logger.log(
-        'Will inject additional scripts: ' + printerOptions.additionalScripts,
+        'Will inject additional scripts: ' +
+          JSON.stringify(printerOptions.additionalScripts),
+      );
+    }
+
+    printerOptions.extraHttpHeaders = [
+      ...(printerOptions.extraHttpHeaders ?? []),
+      ...this.configService.get<string[]>('httpHeaders'),
+    ];
+
+    if (printerOptions.extraHttpHeaders.length > 0) {
+      this.logger.log(
+        'Will add http headers: ' +
+          JSON.stringify(printerOptions.extraHttpHeaders),
       );
     }
 
@@ -50,26 +68,35 @@ export class PagedJsService {
       }
 
       this.logger.debug(`Rendering page ${page.position + 1}`);
+
+      currentStepCallback(PrintStep.RENDERING);
     });
 
     printer.on('rendered', (msg) => {
       this.logger.log(msg);
       this.logger.log('Generating');
+
+      currentStepCallback(PrintStep.GENERATING);
     });
 
     printer.on('postprocessing', () => {
       this.logger.log('Generated');
       this.logger.log('Processing');
+
+      currentStepCallback(PrintStep.POST_PROCESSING);
     });
 
     return printer;
   }
 
   public async printPdf(
-    input: string | RenderInput,
+    input: RenderInput,
     printer: Printer,
+    currentStepCallback: (step: PrintStep) => void,
   ): Promise<Uint8Array> {
-    this.logger.log(`Generate pdf from ${input}`);
+    this.logger.log(`Generate pdf from ${input.url ?? 'html'}`);
+
+    currentStepCallback(PrintStep.LOADING);
 
     try {
       const file = await printer.pdf(input, {
@@ -89,18 +116,23 @@ export class PagedJsService {
   }
 
   public async generateHTML(
-    input: string | RenderInput,
+    input: RenderInput,
     printer: Printer,
+    currentStepCallback: (step: PrintStep) => void,
     additionalStylesAfter: FrameAddStyleTagOptions[] = [],
     additionalScriptsAfter: FrameAddScriptTagOptions[] = [],
   ): Promise<string> {
-    this.logger.log(`Generate html from ${input}`);
+    this.logger.log(`Generate html from ${input.url ?? 'html'}`);
+
+    currentStepCallback(PrintStep.LOADING);
 
     try {
       const page = await printer.preview(input);
 
       this.logger.log('Generated');
       this.logger.log('Processing');
+
+      currentStepCallback(PrintStep.POST_PROCESSING);
 
       // remove the scripts so that it doesn't get executed again on the client
       await page.evaluate(() => {

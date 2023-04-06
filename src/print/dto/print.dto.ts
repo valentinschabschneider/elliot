@@ -1,8 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsOptional, IsPositive } from 'class-validator';
+import { CollectDto } from './collect.dto';
 
-export class PrintDto {
+// that extends is traaaaash
+export class PrintDto extends CollectDto {
   @IsArray()
   @Transform(({ value }) =>
     Array.isArray(value) ? value : value === undefined ? [] : [value],
@@ -29,16 +31,24 @@ export class PrintDto {
     default: true,
   })
   injectPolyfill: boolean = true;
-  @Transform(({ value }) => value === 'true')
-  @IsOptional()
-  @ApiPropertyOptional({
-    description: 'File will be downloaded. Otherwise streamed.',
-    default: true,
+  @IsArray()
+  @Transform(({ value }) => {
+    const headers: string[] = Array.isArray(value)
+      ? value
+      : value === undefined
+      ? []
+      : [value];
+
+    return headers.reduce((acc, header) => {
+      const [name, ...value] = header.split(':');
+      return [...acc, { [name]: value.join(':') }];
+    }, []);
   })
-  download: boolean = true;
   @IsOptional()
+  @Expose({ name: 'httpHeader' })
   @ApiPropertyOptional({
-    description: 'The file name when downloaded.',
+    description: 'HTTP header to set.',
+    default: [],
   })
-  fileName?: string;
+  httpHeaders?: Record<string, string>[];
 }
