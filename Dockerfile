@@ -1,4 +1,4 @@
-FROM node:19.0.0-alpine3.16 as build
+FROM node:19.0.0-alpine3.16 as base
 
 WORKDIR /usr/src/app
 
@@ -7,6 +7,10 @@ COPY package.json yarn.lock ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 RUN yarn install
+
+COPY printer.js "./node_modules/pagedjs-cli/src/printer.js"
+
+FROM base as build
 
 COPY . .
 
@@ -26,8 +30,6 @@ WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
-
-COPY printer.js "./node_modules/pagedjs-cli/src/printer.js"
 
 ENV NODE_ENV=production
 

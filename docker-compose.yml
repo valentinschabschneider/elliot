@@ -1,8 +1,5 @@
 version: '3'
 services:
-  browserless:
-    image: browserless/chrome:1.58-puppeteer-19.7.5
-
   elliot:
     image: valentinschabschneider/elliot
     build: .
@@ -13,3 +10,6 @@ services:
       - 3000:3000
     depends_on:
       - browserless
+
+  browserless:
+    image: browserless/chrome:1.58-puppeteer-19.7.5

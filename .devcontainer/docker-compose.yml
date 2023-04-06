@@ -1,0 +1,9 @@
+version: '3'
+services:
+  elliot:
+    build:
+      target: base
+    volumes:
+      - .:/usr/src/app:cached
+      - /usr/src/app/node_modules
+    command: /bin/sh -c "while sleep 1000; do :; done"
