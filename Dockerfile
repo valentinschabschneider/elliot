@@ -1,4 +1,6 @@
-FROM node:19.0.0-alpine3.16 as base
+ARG NODE_BASE_IMAGE=node:19.0.0-alpine3.16
+
+FROM $NODE_BASE_IMAGE as base
 
 WORKDIR /usr/src/app
 

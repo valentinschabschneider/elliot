@@ -3,6 +3,8 @@ services:
   elliot:
     build:
       target: base
+      args:
+        NODE_BASE_IMAGE: node:19
     volumes:
       - .:/usr/src/app:cached
       - /usr/src/app/node_modules
