@@ -46,6 +46,8 @@ export class PagedJsService {
       );
     }
 
+    // TODO: merge headers arrays
+
     const printer = new this.CPrinter(printerOptions);
 
     printer.on('page', (page) => {

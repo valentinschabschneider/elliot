@@ -49,7 +49,7 @@ export class PrintNowController {
       timeout,
       fileName,
       injectPolyfill,
-      extraHttpHeaders,
+      httpHeaders,
     }: PrintUrlRequiredDto,
   ) {
     return this.doStuff(
@@ -59,7 +59,7 @@ export class PrintNowController {
         additionalScripts,
         timeout,
         injectPolyfill,
-        extraHttpHeaders,
+        httpHeaders,
       },
       PRIORITY,
       response,
@@ -84,7 +84,7 @@ export class PrintNowController {
       timeout,
       fileName,
       injectPolyfill,
-      extraHttpHeaders,
+      httpHeaders,
     }: PrintUrlOptionalDto,
     @Body() html: string,
   ) {
@@ -109,7 +109,7 @@ export class PrintNowController {
         additionalScripts,
         timeout,
         injectPolyfill,
-        extraHttpHeaders,
+        httpHeaders,
       },
       PRIORITY,
       response,
@@ -133,7 +133,7 @@ export class PrintNowController {
       timeout,
       fileName,
       injectPolyfill,
-      extraHttpHeaders,
+      httpHeaders,
     } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
     return this.doStuff(
@@ -143,7 +143,7 @@ export class PrintNowController {
         additionalScripts,
         timeout,
         injectPolyfill,
-        extraHttpHeaders,
+        httpHeaders,
       },
       PRIORITY,
       response,

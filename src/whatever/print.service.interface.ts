@@ -7,7 +7,7 @@ export interface IPrintService {
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
-    extraHttpHeaders: Record<string, string>[],
+    httpHeaders: Record<string, string>[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<any>;
   createResponse(

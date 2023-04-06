@@ -17,7 +17,7 @@ export class PrintPdfService implements IPrintService {
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
-    extraHttpHeaders: Record<string, string>[],
+    httpHeaders: Record<string, string>[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<Array<number>> {
     const file = await this.pagedjsService.printPdf(
@@ -28,7 +28,7 @@ export class PrintPdfService implements IPrintService {
           timeout,
           closeAfter: true,
           disableScriptInjection: !injectPolyfill,
-          extraHttpHeaders,
+          extraHttpHeaders: httpHeaders,
         },
         currentStepCallback,
       ),

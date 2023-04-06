@@ -39,7 +39,7 @@ export class PrintSoonController {
       additionalScripts,
       timeout,
       injectPolyfill,
-      extraHttpHeaders,
+      httpHeaders,
     }: PrintUrlOptionalDto,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
@@ -64,7 +64,7 @@ export class PrintSoonController {
         additionalScripts,
         timeout,
         injectPolyfill,
-        extraHttpHeaders,
+        httpHeaders,
       },
       PRIORITY,
     );

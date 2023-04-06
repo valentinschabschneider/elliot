@@ -22,7 +22,7 @@ export class PrintHtmlService implements IPrintService {
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
-    extraHttpHeaders: Record<string, string>[],
+    httpHeaders: Record<string, string>[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<string> {
     const preview = true;
@@ -39,7 +39,7 @@ export class PrintHtmlService implements IPrintService {
           ).toString(),
           closeAfter: false,
           disableScriptInjection: !injectPolyfill,
-          extraHttpHeaders,
+          extraHttpHeaders: httpHeaders,
         },
         currentStepCallback,
       ),

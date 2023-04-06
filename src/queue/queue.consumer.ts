@@ -28,7 +28,7 @@ export class QueueConsumer {
       job.data.additionalScripts,
       job.data.timeout,
       job.data.injectPolyfill,
-      job.data.extraHttpHeaders,
+      job.data.httpHeaders,
       async (step: PrintStep) => await job.progress(step.toString()),
     );
 

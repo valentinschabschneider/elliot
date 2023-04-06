@@ -45,10 +45,10 @@ export class PrintDto extends CollectDto {
     }, []);
   })
   @IsOptional()
-  @Expose({ name: 'extraHttpHeader' })
+  @Expose({ name: 'httpHeader' })
   @ApiPropertyOptional({
-    description: 'Additional scripts to load.',
+    description: 'HTTP header to set.',
     default: [],
   })
-  extraHttpHeaders?: Record<string, string>[];
+  httpHeaders?: Record<string, string>[];
 }
