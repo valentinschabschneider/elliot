@@ -45,6 +45,7 @@ export class PrintNowController {
     {
       url,
       download,
+      additionalStyles,
       additionalScripts,
       timeout,
       fileName,
@@ -56,6 +57,7 @@ export class PrintNowController {
       {
         input: { url },
         outputType,
+        additionalStyles,
         additionalScripts,
         timeout,
         injectPolyfill,
@@ -80,6 +82,7 @@ export class PrintNowController {
     {
       url,
       download,
+      additionalStyles,
       additionalScripts,
       timeout,
       fileName,
@@ -106,6 +109,7 @@ export class PrintNowController {
       {
         input: { url },
         outputType,
+        additionalStyles,
         additionalScripts,
         timeout,
         injectPolyfill,
@@ -129,6 +133,7 @@ export class PrintNowController {
     const {
       url,
       download,
+      additionalStyles,
       additionalScripts,
       timeout,
       fileName,
@@ -140,6 +145,7 @@ export class PrintNowController {
       {
         input: { url },
         outputType,
+        additionalStyles,
         additionalScripts,
         timeout,
         injectPolyfill,

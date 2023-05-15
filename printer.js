@@ -174,6 +174,8 @@ class Printer extends EventEmitter {
         await page.goto(url);
       }
 
+      await page.waitForFunction(() => document.readyState === 'complete');
+
       this.content = await page.content();
 
       if (!this.disableScriptInjection) {
@@ -189,13 +191,13 @@ class Printer extends EventEmitter {
 
       for (const style of this.styles) {
         await page.addStyleTag({
-          path: style,
+          [this.isUrl(style) ? 'url' : 'path']: style,
         });
       }
 
       for (const script of this.additionalScripts) {
         await page.addScriptTag({
-          url: script,
+          [this.isUrl(script) ? 'url' : 'path']: script,
         });
       }
 
@@ -433,6 +435,15 @@ class Printer extends EventEmitter {
       return true;
     }
     return this.allowedDomains.includes(domain);
+  }
+
+  isUrl(resource) {
+    try {
+      new URL(resource);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

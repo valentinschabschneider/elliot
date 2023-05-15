@@ -14,6 +14,7 @@ export class PrintPdfService implements IPrintService {
 
   public async print(
     input: PrintInput,
+    additionalStyles: string[],
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
@@ -24,6 +25,7 @@ export class PrintPdfService implements IPrintService {
       input,
       this.pagedjsService.createPrinter(
         {
+          styles: additionalStyles,
           additionalScripts,
           timeout,
           closeAfter: true,

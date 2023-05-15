@@ -4,6 +4,7 @@ import { PrintOutputType } from './print-output-type.enum';
 export interface PrintOptions {
   input: PrintInput;
   outputType: PrintOutputType;
+  additionalStyles: string[];
   additionalScripts: string[];
   timeout: number;
   injectPolyfill: boolean;

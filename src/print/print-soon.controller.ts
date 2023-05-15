@@ -36,6 +36,7 @@ export class PrintSoonController {
     @Query(new ValidationPipe({ transform: true }))
     {
       url,
+      additionalStyles,
       additionalScripts,
       timeout,
       injectPolyfill,
@@ -61,6 +62,7 @@ export class PrintSoonController {
       {
         input: { url, html },
         outputType,
+        additionalStyles,
         additionalScripts,
         timeout,
         injectPolyfill,

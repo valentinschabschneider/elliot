@@ -4,6 +4,7 @@ import { PrintStep } from 'src/pagedjs/print-step.enum';
 export interface IPrintService {
   print(
     input: string | { url?: string; html?: string },
+    additionalStyles: string[],
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,

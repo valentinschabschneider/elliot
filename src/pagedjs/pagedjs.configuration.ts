@@ -7,6 +7,9 @@ export default () => {
     browserEndpoint: get('BROWSERLESS_ENDPOINT').asString(),
     maxTimeout: get('MAX_TIMEOUT').required(isProduction).asIntPositive(),
     debug: get('DEBUG').default('false').asBool(),
+    additionalStyles: get('ADDITIONAL_STYLES')
+      .default('[]')
+      .asJsonArray() as string[],
     additionalScripts: get('ADDITIONAL_SCRIPTS')
       .default('[]')
       .asJsonArray() as string[],

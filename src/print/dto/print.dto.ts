@@ -10,6 +10,17 @@ export class PrintDto extends CollectDto {
     Array.isArray(value) ? value : value === undefined ? [] : [value],
   )
   @IsOptional()
+  @Expose({ name: 'additionalStyle' })
+  @ApiPropertyOptional({
+    description: 'Additional styles to load.',
+    default: [],
+  })
+  additionalStyles?: string[];
+  @IsArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value : value === undefined ? [] : [value],
+  )
+  @IsOptional()
   @Expose({ name: 'additionalScript' })
   @ApiPropertyOptional({
     description: 'Additional scripts to load.',

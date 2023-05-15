@@ -19,6 +19,7 @@ export class PrintHtmlService implements IPrintService {
 
   async print(
     input: PrintInput,
+    additionalStyles: string[],
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
@@ -31,6 +32,7 @@ export class PrintHtmlService implements IPrintService {
       input,
       this.pagedjsService.createPrinter(
         {
+          styles: additionalStyles,
           additionalScripts,
           timeout,
           emulateMedia: (preview

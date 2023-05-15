@@ -25,6 +25,7 @@ export class QueueConsumer {
 
     const data = await printService.print(
       job.data.input,
+      job.data.additionalStyles,
       job.data.additionalScripts,
       job.data.timeout,
       job.data.injectPolyfill,

@@ -36,6 +36,18 @@ export class PagedJsService {
     printerOptions.debug =
       printerOptions.debug ?? this.configService.get('debug') == 'true'; // doesn't just return boolean for some reason
 
+    printerOptions.styles = [
+      ...(printerOptions.styles ?? []),
+      ...this.configService.get<string[]>('additionalStyles'),
+    ];
+
+    if (printerOptions.styles.length > 0) {
+      this.logger.log(
+        'Will inject additional styles: ' +
+          JSON.stringify(printerOptions.styles),
+      );
+    }
+
     printerOptions.additionalScripts = [
       ...(printerOptions.additionalScripts ?? []),
       ...this.configService.get<string[]>('additionalScripts'),
