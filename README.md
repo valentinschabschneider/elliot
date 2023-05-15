@@ -20,4 +20,4 @@ Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
 
 ## Contribute
 
-Use the included `.devcontainer` as your dev environment.
+Use the included `.devcontainer` as your dev environment..
