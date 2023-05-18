@@ -358,7 +358,10 @@ class Printer extends EventEmitter {
         throw e;
       });
 
-      this.closeAfter && page.close();
+      if (this.closeAfter) {
+        page.close();
+        this.close();
+      }
 
       this.emit('postprocessing');
 
