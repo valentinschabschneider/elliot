@@ -31,7 +31,7 @@ export class PrintSoonController {
   @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
   @ApiBody({ required: false })
-  async printNowWithParamsPost(
+  async printSoonWithParamsPost(
     @Param('outputType') outputType: PrintOutputType,
     @Query(new ValidationPipe({ transform: true }))
     {
