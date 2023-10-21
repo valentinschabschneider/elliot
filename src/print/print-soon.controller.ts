@@ -14,9 +14,9 @@ import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { PrintQueueService } from '../queue/print-queue.service';
 import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
+import { PrinterQueueService } from '../queue/printer-queue.service';
 import { PrintOutputType } from '../whatever/print-output-type.enum';
 import { PrintUrlCallbackOptionalDto } from './dto/print-url-callback-optional.dto';
 
@@ -24,7 +24,7 @@ const PRIORITY = 1;
 @Controller('print/:outputType/soon')
 @ApiTags('print/soon')
 export class PrintSoonController {
-  constructor(private readonly queueService: PrintQueueService) {}
+  constructor(private readonly printerQueueService: PrinterQueueService) {}
 
   @Post()
   @UseGuards(ApiKeyAuthGuard)
@@ -58,7 +58,7 @@ export class PrintSoonController {
       }
     }
 
-    const job = await this.queueService.addPrintJob(
+    const job = await this.printerQueueService.addPrintJob(
       {
         input: { url, html },
         outputType,
@@ -78,8 +78,8 @@ export class PrintSoonController {
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
-    const job = await this.queueService.getPrintJob(jobId);
+    const job = await this.printerQueueService.getPrintJob(jobId);
 
-    return this.queueService.getPrintJobStatus(job);
+    return this.printerQueueService.getPrintJobStatus(job);
   }
 }

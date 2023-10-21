@@ -9,14 +9,14 @@ import { Job } from 'bull';
 import { HttpService } from '@nestjs/axios';
 import { Logger } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
-import { PrintQueueService } from './print-queue.service';
+import { PrinterQueueService } from './printer-queue.service';
 
 @Processor({ name: 'callbacker' })
 export class CallbackQueueConsumer {
   private readonly logger = new Logger(CallbackQueueConsumer.name);
 
   constructor(
-    private readonly printQueueService: PrintQueueService,
+    private readonly printerQueueService: PrinterQueueService,
     private readonly httpService: HttpService,
   ) {}
 
@@ -24,11 +24,11 @@ export class CallbackQueueConsumer {
   async transcode(job: Job<string>) {
     this.logger.log(`Process callback job ${job.data}`);
 
-    const printJob = await this.printQueueService.getPrintJob(job.data);
+    const printJob = await this.printerQueueService.getPrintJob(job.data);
 
     this.logger.log(`Sending callback ${printJob.data.callbackUrl}`);
 
-    const printJobStatus = await this.printQueueService.getPrintJobStatus(
+    const printJobStatus = await this.printerQueueService.getPrintJobStatus(
       printJob,
     );
 

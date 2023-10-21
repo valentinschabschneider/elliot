@@ -4,9 +4,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { WhateverModule } from 'src/whatever/whatever.module';
 import { CallbackQueueConsumer } from './callback-queue.consumer';
-import { PrintQueueService } from './print-queue.service';
+import { PrinterQueueConsumer } from './printer-queue.consumer';
+import { PrinterQueueService } from './printer-queue.service';
 import configuration from './queue.configuration';
-import { QueueConsumer } from './queue.consumer';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { QueueConsumer } from './queue.consumer';
     }),
     HttpModule,
   ],
-  providers: [PrintQueueService, QueueConsumer, CallbackQueueConsumer],
-  exports: [PrintQueueService],
+  providers: [PrinterQueueService, PrinterQueueConsumer, CallbackQueueConsumer],
+  exports: [PrinterQueueService],
 })
 export class QueueModule {}

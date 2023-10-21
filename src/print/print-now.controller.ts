@@ -19,7 +19,7 @@ import { Response } from 'express';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { JwtParamAuthGuard } from '../auth/jwt-param-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
-import { PrintQueueService } from '../queue/print-queue.service';
+import { PrinterQueueService } from '../queue/printer-queue.service';
 import { PrintOptions } from '../whatever/print-options.interface';
 import { PrintOutputType } from '../whatever/print-output-type.enum'; // TODO: dont konw if it should be here, mabye common
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
@@ -31,7 +31,7 @@ const PRIORITY = 2;
 @ApiTags('print/now')
 export class PrintNowController {
   constructor(
-    private readonly printQueueService: PrintQueueService,
+    private readonly printerQueueService: PrinterQueueService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -160,7 +160,7 @@ export class PrintNowController {
     download: boolean,
     fileName: string,
   ) {
-    const job = await this.printQueueService.addPrintJob(options, priority);
+    const job = await this.printerQueueService.addPrintJob(options, priority);
 
     try {
       await job.finished();
