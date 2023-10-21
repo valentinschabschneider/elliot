@@ -50,6 +50,7 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
+      cleanupJob,
     }: PrintUrlRequiredDto,
   ) {
     return this.doStuff(
@@ -65,6 +66,7 @@ export class PrintNowController {
       response,
       download,
       fileName,
+      cleanupJob,
     );
   }
 
@@ -85,6 +87,7 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
+      cleanupJob,
     }: PrintUrlOptionalDto,
     @Body() html: string,
   ) {
@@ -115,6 +118,7 @@ export class PrintNowController {
       response,
       download,
       fileName,
+      cleanupJob,
     );
   }
 
@@ -134,6 +138,7 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
+      cleanupJob,
     } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
     return this.doStuff(
@@ -149,6 +154,7 @@ export class PrintNowController {
       response,
       download,
       fileName,
+      cleanupJob,
     );
   }
 
@@ -159,6 +165,7 @@ export class PrintNowController {
     response: Response,
     download: boolean,
     fileName: string,
+    cleanupJob: boolean,
   ) {
     const job = await this.printerQueueService.addPrintJob(options, priority);
 
@@ -169,7 +176,7 @@ export class PrintNowController {
     }
 
     return response.redirect(
-      `/collect/${job.id}?download=${download}` +
+      `/collect/${job.id}?download=${download}&cleanupJob=${cleanupJob}` +
         (fileName !== undefined ? `&fileName=${fileName}` : ''), // TODO: make better
     );
   }

@@ -1,4 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsOptional } from 'class-validator';
 import { PrintDto } from './print.dto';
 
 export class PrintUrlOptionalDto extends PrintDto {
@@ -7,4 +9,11 @@ export class PrintUrlOptionalDto extends PrintDto {
     required: false,
   })
   url?: string;
+  @Transform(({ value }) => value === 'true')
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Cleanup job data.',
+    default: false,
+  })
+  cleanupJob: boolean = false;
 }

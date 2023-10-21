@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
 import { PrinterQueueService } from '../queue/printer-queue.service';
 import { PrintServiceFactory } from '../whatever/print.service.factory';
-import { PrintUrlCollectOptionalDto } from './dto/print-url-collect-optional.dto';
+import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 
 @Controller('collect/:jobId')
 @ApiTags('collect')
@@ -37,7 +37,7 @@ export class CollectController {
     @Res({ passthrough: true }) response: Response,
     @Param('jobId') jobId: string,
     @Query(new ValidationPipe({ transform: true }))
-    { download, fileName, cleanupJob }: PrintUrlCollectOptionalDto,
+    { download, fileName, cleanupJob }: PrintUrlOptionalDto,
   ): Promise<StreamableFile | string> {
     this.logger.log(`Collecting job ${jobId}`);
 
