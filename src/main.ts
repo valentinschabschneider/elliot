@@ -20,7 +20,7 @@ async function bootstrap() {
     rawBody: true,
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.ENABLE_DASHBOARDS === 'true') {
     const config = new DocumentBuilder()
       .setTitle('Elliot example')
       .setDescription('The elliot API description')
