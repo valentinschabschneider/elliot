@@ -110,8 +110,7 @@ export class PagedJsService {
 
       return file;
     } catch (error) {
-      this.logger.error(error);
-      throw new PagedJsException();
+      throw new PagedJsException(error);
     }
   }
 
@@ -160,8 +159,7 @@ export class PagedJsService {
 
       return html;
     } catch (error) {
-      this.logger.error(error);
-      throw new PagedJsException();
+      throw new PagedJsException(error);
     }
   }
 }

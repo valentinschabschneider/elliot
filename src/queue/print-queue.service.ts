@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 
 import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
 import { JobReturnValue } from './job-return-value.interface';
+import { PrintStatus } from './print-status.interface';
 
 @Injectable()
 export class PrintQueueService {
@@ -44,6 +45,17 @@ export class PrintQueueService {
     }
 
     return job.returnvalue;
+  }
+
+  public async getPrintJobStatus(job: Job): Promise<PrintStatus> {
+    return {
+      state: (await job.isActive())
+        ? (await job.progress()) == 0
+          ? 'starting'
+          : await job.progress()
+        : await job.getState(),
+      error: job.failedReason,
+    };
   }
 
   @Cron('0 * * * * *')

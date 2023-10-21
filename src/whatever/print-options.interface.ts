@@ -8,4 +8,5 @@ export interface PrintOptions {
   timeout: number;
   injectPolyfill: boolean;
   httpHeaders: Record<string, string>[];
+  callbackUrl?: string | undefined;
 }

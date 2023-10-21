@@ -18,7 +18,7 @@ import { PrintQueueService } from '../queue/print-queue.service';
 import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
 import { PrintOutputType } from '../whatever/print-output-type.enum';
-import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
+import { PrintUrlCallbackOptionalDto } from './dto/print-url-callback-optional.dto';
 
 const PRIORITY = 1;
 @Controller('print/:outputType/soon')
@@ -40,7 +40,8 @@ export class PrintSoonController {
       timeout,
       injectPolyfill,
       httpHeaders,
-    }: PrintUrlOptionalDto,
+      callbackUrl,
+    }: PrintUrlCallbackOptionalDto,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
     if (url === undefined && (typeof html !== 'string' || html === '')) {
@@ -65,6 +66,7 @@ export class PrintSoonController {
         timeout,
         injectPolyfill,
         httpHeaders,
+        callbackUrl,
       },
       PRIORITY,
     );
@@ -78,13 +80,6 @@ export class PrintSoonController {
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
     const job = await this.queueService.getPrintJob(jobId);
 
-    return {
-      state: job.isActive()
-        ? job.progress() == 0
-          ? 'starting'
-          : job.progress()
-        : job.getState(),
-      error: job.failedReason,
-    }; // TODO: make better
+    return this.queueService.getPrintJobStatus(job);
   }
 }

@@ -1,5 +1,11 @@
-import { Process, Processor } from '@nestjs/bull';
-import { Job } from 'bull';
+import {
+  InjectQueue,
+  OnQueueCompleted,
+  OnQueueFailed,
+  Process,
+  Processor,
+} from '@nestjs/bull';
+import { Job, Queue } from 'bull';
 import { get } from 'env-var';
 
 import { Logger } from '@nestjs/common';
@@ -12,12 +18,15 @@ import { JobReturnValue } from './job-return-value.interface';
 export class QueueConsumer {
   private readonly logger = new Logger(QueueConsumer.name);
 
-  constructor(private readonly printServiceFactory: PrintServiceFactory) {}
+  constructor(
+    private readonly printServiceFactory: PrintServiceFactory,
+    @InjectQueue('callbacker') private callbackQueue: Queue,
+  ) {}
 
   @Process({
     name: 'print',
-    concurrency: get('QUEUE_CONCURRENCY').default(1).asIntPositive(),
-  }) // TODO: hmmmmmmmmm
+    concurrency: get('QUEUE_CONCURRENCY').default(1).asIntPositive(), // TODO: hmmmmmmmmm
+  })
   async transcode(job: Job<PrintOptions>): Promise<JobReturnValue> {
     this.logger.log(`Process job ${job.id}`);
 
@@ -33,5 +42,27 @@ export class QueueConsumer {
     );
 
     return { data, outputType: job.data.outputType };
+  }
+
+  @OnQueueCompleted({ name: 'print' })
+  completedHandler(job: Job) {
+    this.logger.log(`Finished print ${job.id}`);
+
+    this.processHandler(job);
+  }
+
+  @OnQueueFailed({ name: 'print' })
+  failedHandler(job: Job, e: Error) {
+    this.logger.error(`Failed print ${job.id}`, e);
+
+    this.processHandler(job);
+  }
+
+  private processHandler(job: Job) {
+    if (job.data.callbackUrl) {
+      this.logger.log(`Addin callback job for print job ${job.id}`);
+
+      this.callbackQueue.add('callback', job.id);
+    }
   }
 }
