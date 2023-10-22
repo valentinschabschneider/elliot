@@ -1,11 +1,11 @@
 import { get } from 'env-var';
 
 export default () => {
-  const isProduction = get('NODE_ENV').required().asString() == 'production';
-
   return {
     browserEndpoint: get('BROWSERLESS_ENDPOINT').asString(),
-    maxTimeout: get('MAX_TIMEOUT').required(isProduction).asIntPositive(),
+    maxTimeout: get('MAX_TIMEOUT')
+      .default(10 * 1000)
+      .asIntPositive(),
     debug: get('DEBUG').default('false').asBool(),
     additionalScripts: get('ADDITIONAL_SCRIPTS')
       .default('[]')
