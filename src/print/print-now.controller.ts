@@ -13,7 +13,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
@@ -36,6 +36,7 @@ export class PrintNowController {
   ) {}
 
   @Get()
+  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   async printNowWithParams(
@@ -71,6 +72,7 @@ export class PrintNowController {
   }
 
   @Post()
+  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
