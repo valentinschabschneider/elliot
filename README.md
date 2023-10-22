@@ -22,6 +22,10 @@ In the background they are basically doing the same thing, but the print `now` e
 Because of the redirect to the collect endpoint you should make sure that the api client that you're using is configured to allow redirects.
 The print `soon` endpoint returns a job id with whicht you can check the job status and collect the result later.
 
+### Input types
+
+URL's (file paths with the `file://` protocol as well) and raw HTML are supported.
+
 ### Output types
 
 Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of what the generated PDF would look like.
@@ -52,6 +56,10 @@ Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
 
 This project is basically an api wrapper around the [pagedjs-cli](https://gitlab.coko.foundation/pagedjs/pagedjs-cli) package with a few additional tweaks and features.
 The main difference is that you can skip the polyfill script injection. This allows you to have the polyfill import + additional handlers inside your HTML.
+
+### Included static files
+
+For your convenience Elliot exposes a view static files that can come in handy (preview styles / handlers). You can find them under [/src/static](/src/static) which is also exposed under `/static` when hosted. View the demo sources to see how to use them.
 
 ## Contribute
 
