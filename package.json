@@ -1,6 +1,6 @@
 {
   "name": "elliot",
-  "version": "0.1.0",
+  "version": "0.4.1",
   "description": "Elliot is a web service that converts HTML to PDFs with Paged.js.",
   "author": "Valentin Schabschneider",
   "private": false,
