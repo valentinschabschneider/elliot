@@ -10,7 +10,7 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
@@ -27,6 +27,7 @@ export class PrintSoonController {
   constructor(private readonly printerQueueService: PrinterQueueService) {}
 
   @Post()
+  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
@@ -75,6 +76,7 @@ export class PrintSoonController {
   }
 
   @Get(':jobId')
+  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
