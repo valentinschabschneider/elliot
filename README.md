@@ -12,7 +12,7 @@ Check out the [demo](https://github.com/valentinschabschneider/elliot-demo).
 
 ## OpenAPI documentation
 
-OpenAPI documentation can be accessed via http://localhost:3000/api with your browser.
+View the OpenAPI documentation of the hosted demo at https://elliot.up.railway.app/api or locally via http://localhost:3000/api with your browser.
 
 ## Error handling
 
