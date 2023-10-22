@@ -7,7 +7,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import { Queue } from 'bull';
 
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
+
+const logger = new Logger('AuthConfiguration');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -21,6 +24,9 @@ async function bootstrap() {
   });
 
   if (process.env.ENABLE_DASHBOARDS === 'true') {
+    if (process.env.NODE_ENV === 'production')
+      logger.warn('Dashboards are enabled in production!');
+
     const config = new DocumentBuilder()
       .setTitle('Elliot example')
       .setDescription('The elliot API description')
