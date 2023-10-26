@@ -13,7 +13,7 @@ export class PrintUrlOptionalDto extends PrintDto {
   @IsOptional()
   @ApiPropertyOptional({
     description: 'Cleanup job data.',
-    default: false,
+    default: true,
   })
-  cleanupJob: boolean = false;
+  cleanupJob: boolean = true;
 }

@@ -8,12 +8,19 @@ import {
   Post,
   Query,
   Res,
+  StreamableFile,
   UseFilters,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ApiBody, ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
@@ -22,6 +29,7 @@ import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filt
 import { PrinterQueueService } from '../queue/printer-queue.service';
 import { PrintOptions } from '../whatever/print-options.interface';
 import { PrintOutputType } from '../whatever/print-output-type.enum'; // TODO: dont konw if it should be here, mabye common
+import { CollectService } from './collect.service';
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 import { PrintUrlRequiredDto } from './dto/print-url-required.dto';
 
@@ -33,12 +41,16 @@ export class PrintNowController {
   constructor(
     private readonly printerQueueService: PrinterQueueService,
     private readonly jwtService: JwtService,
+    private readonly collectService: CollectService,
   ) {}
 
   @Get()
-  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
+  @ApiSecurity('Api key')
+  @ApiOkResponse({
+    description: 'PDF file or HTML string depending on the output type.',
+  })
   async printNowWithParams(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
@@ -51,9 +63,8 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
-      cleanupJob,
     }: PrintUrlRequiredDto,
-  ) {
+  ): Promise<StreamableFile | string> {
     return this.doStuff(
       {
         input: { url },
@@ -67,16 +78,18 @@ export class PrintNowController {
       response,
       download,
       fileName,
-      cleanupJob,
     );
   }
 
   @Post()
-  @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
+  @ApiSecurity('Api key')
   @ApiConsumes('text/html')
   @ApiBody({ required: false })
+  @ApiOkResponse({
+    description: 'PDF file or HTML string depending on the output type.',
+  })
   async printNowWithParamsPost(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
@@ -89,10 +102,9 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
-      cleanupJob,
     }: PrintUrlOptionalDto,
     @Body() html: string,
-  ) {
+  ): Promise<StreamableFile | string> {
     if (url === undefined && (typeof html !== 'string' || html === '')) {
       throw new BadRequestException(
         'You have to set either url or html parameter.',
@@ -120,18 +132,20 @@ export class PrintNowController {
       response,
       download,
       fileName,
-      cleanupJob,
     );
   }
 
   @Get(':jwt')
   @UseGuards(JwtParamAuthGuard)
   @UseFilters(ConditionalHtmlExceptionsFilter)
+  @ApiOkResponse({
+    description: 'PDF file or HTML string depending on the output type.',
+  })
   async printNowWithJwt(
     @Res({ passthrough: true }) response: Response,
     @Param('outputType') outputType: PrintOutputType,
     @Param('jwt') jwt: string,
-  ) {
+  ): Promise<StreamableFile | string> {
     const {
       url,
       download,
@@ -140,7 +154,6 @@ export class PrintNowController {
       fileName,
       injectPolyfill,
       httpHeaders,
-      cleanupJob,
     } = Object.assign(new PrintUrlRequiredDto(), this.jwtService.decode(jwt));
 
     return this.doStuff(
@@ -156,7 +169,6 @@ export class PrintNowController {
       response,
       download,
       fileName,
-      cleanupJob,
     );
   }
 
@@ -167,19 +179,23 @@ export class PrintNowController {
     response: Response,
     download: boolean,
     fileName: string,
-    cleanupJob: boolean,
-  ) {
+  ): Promise<StreamableFile | string> {
     const job = await this.printerQueueService.addPrintJob(options, priority);
 
+    let jobReturnValue = null;
+
     try {
-      await job.finished();
+      jobReturnValue = await job.finished();
     } catch (e) {
       throw new InternalServerErrorException(e.message);
     }
 
-    return response.redirect(
-      `/collect/${job.id}?download=${download}&cleanupJob=${cleanupJob}` +
-        (fileName !== undefined ? `&fileName=${fileName}` : ''), // TODO: make better
+    return this.collectService.buildCollectResponse(
+      jobReturnValue,
+      download,
+      fileName,
+      job,
+      response,
     );
   }
 }

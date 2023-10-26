@@ -1,12 +1,11 @@
 import { InjectQueue } from '@nestjs/bull';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 
 import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
-import { JobReturnValue } from './job-return-value.interface';
 import { PrintStatus } from './print-status.interface';
 
 @Injectable()
@@ -35,14 +34,6 @@ export class PrinterQueueService {
     const job = await this.printerQueue.getJob(id);
 
     return job;
-  }
-
-  public async getPrintJobResult(job: Job): Promise<JobReturnValue> {
-    if (!(await job.isCompleted())) {
-      throw new BadRequestException('Job not finished yet');
-    }
-
-    return job.returnvalue;
   }
 
   public async getPrintJobStatus(job: Job): Promise<PrintStatus> {

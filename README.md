@@ -18,8 +18,7 @@ View the OpenAPI documentation of the hosted demo at https://elliot.up.railway.a
 
 There are some things you should know before making requests to Elliot.
 First of all there are two different ways to generate PDF's. Synchronous (`now`) and asynchronous (`soon`).
-In the background they are basically doing the same thing, but the print `now` endpoints wait for the print job to finish and then redirects to the collect endpoint.
-Because of the redirect to the collect endpoint you should make sure that the api client that you're using is configured to allow redirects.
+In the background they are basically doing the same thing, but the print `now` endpoints wait for the print job to finish and then returns the result.
 The print `soon` endpoint returns a job id with whicht you can check the job status and collect the result later.
 
 ### Input types
@@ -45,7 +44,7 @@ Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
 | SECRET_KEY                  | Highly recomended if not run in a private network.                                                   |          |         |
 | BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                         |          |         |
 | MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached. |          | 10000   |
-| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds                                           |          | 3600000 |
+| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds if not cleaned up on collect.             |          | 3600000 |
 | ADDITIONAL_SCRIPTS          | Additional js code that will be run in every print. Very useful for handlers.                        |          | []      |
 | HTTP_HEADERS                | HTTP headers that will be set on the get request for the page to be printed.                         |          | []      |
 | CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                           |          | false   |

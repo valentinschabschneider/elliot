@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Logger,
@@ -8,15 +9,17 @@ import {
   Res,
   StreamableFile,
   UseFilters,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
 import { ConfigService } from '@nestjs/config';
+import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
 import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
 import { PrinterQueueService } from '../queue/printer-queue.service';
-import { PrintServiceFactory } from '../whatever/print.service.factory';
+import { CollectService } from './collect.service';
 import { PrintUrlOptionalDto } from './dto/print-url-optional.dto';
 
 @Controller('collect/:jobId')
@@ -26,13 +29,16 @@ export class CollectController {
 
   constructor(
     private readonly printerQueueService: PrinterQueueService,
-    private readonly printServiceFactory: PrintServiceFactory,
     private readonly configService: ConfigService,
+    private readonly collectService: CollectService,
   ) {}
 
   @Get()
-  // @UseGuards(ApiKeyAuthGuard) // hmmmmm
+  @UseGuards(ApiKeyAuthGuard)
   @UseFilters(new ConditionalHtmlExceptionsFilter())
+  @ApiOkResponse({
+    description: 'PDF file or HTML string depending on the job output type.',
+  })
   async getJobResult(
     @Res({ passthrough: true }) response: Response,
     @Param('jobId') jobId: string,
@@ -45,27 +51,18 @@ export class CollectController {
 
     if (!job) throw new NotFoundException('Job not found');
 
-    const jobReturnValue = await this.printerQueueService.getPrintJobResult(
-      job,
-    );
+    if (!(await job.isCompleted())) {
+      throw new BadRequestException('Job not finished yet');
+    }
 
-    const printService = this.printServiceFactory.create(
-      jobReturnValue.outputType,
-    );
-
-    const collectResponse = printService.createResponse(
-      jobReturnValue.data,
+    return this.collectService.buildCollectResponse(
+      job.returnvalue,
       download,
       fileName,
+      this.configService.get<boolean>('cleanupJobAfterCollected') || cleanupJob
+        ? job
+        : null,
       response,
     );
-
-    if (
-      this.configService.get<boolean>('cleanupJobAfterCollected') ||
-      cleanupJob
-    )
-      await this.printerQueueService.removePrintJob(job);
-
-    return collectResponse;
   }
 }
