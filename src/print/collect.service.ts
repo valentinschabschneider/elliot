@@ -17,8 +17,6 @@ export class CollectService {
 
   async buildCollectResponse(
     jobReturnValue: JobReturnValue,
-    download: boolean,
-    fileName: string,
     cleanupJob: Job | null,
     response: Response,
   ): Promise<StreamableFile | string> {
@@ -28,8 +26,6 @@ export class CollectService {
 
     const collectResponse = printService.createResponse(
       jobReturnValue.data,
-      download,
-      fileName,
       response,
     );
 

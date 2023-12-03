@@ -10,10 +10,5 @@ export interface IPrintService {
     httpHeaders: Record<string, string>[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<any>;
-  createResponse(
-    data: any,
-    download: boolean,
-    fileName: string,
-    response: Response,
-  ): any;
+  createResponse(data: any, response: Response): any;
 }

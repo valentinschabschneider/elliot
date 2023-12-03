@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PrintUrlOptionalDto } from './print-url-optional.dto';
+import { PrintDto } from './print.dto';
 
-export class PrintUrlCallbackOptionalDto extends PrintUrlOptionalDto {
+export class PrintUrlCallbackOptionalDto extends PrintDto {
   @ApiProperty({
     description: 'Url of the callback endpoint that should be called.',
     required: false,

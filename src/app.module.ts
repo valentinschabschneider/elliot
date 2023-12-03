@@ -27,12 +27,15 @@ import { WhateverModule } from './whatever/whatever.module';
     PreviewModule,
     PagedjsModule,
     BullModule.forRoot({
-      redis: {
-        host: get('REDIS_URL').required().asUrlObject().hostname,
-        password: get('REDIS_URL').required().asUrlObject().password,
-        port: Number(get('REDIS_URL').required().asUrlObject().port),
-        username: get('REDIS_URL').required().asUrlObject().username,
-      }, // TODO: better?
+      redis:
+        get('REDIS_URL').asUrlObject() !== undefined
+          ? {
+              host: get('REDIS_URL').asUrlObject().hostname,
+              password: get('REDIS_URL').asUrlObject().password,
+              port: Number(get('REDIS_URL').asUrlObject().port),
+              username: get('REDIS_URL').asUrlObject().username,
+            }
+          : null, // TODO: better?
     }),
     QueueModule,
     WhateverModule,

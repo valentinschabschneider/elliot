@@ -50,17 +50,8 @@ export class PrintHtmlService implements IPrintService {
     );
   }
 
-  public createResponse(
-    data: any,
-    download: boolean,
-    fileName: string,
-    response: Response,
-  ): string {
-    if (download) {
-      response.attachment(fileName ?? 'document.html');
-    } else {
-      response.contentType('text/html');
-    }
+  public createResponse(data: any, response: Response): string {
+    response.contentType('text/html');
 
     return data;
   }

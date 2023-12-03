@@ -3,39 +3,62 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
-  UseFilters,
+  Res,
+  StreamableFile,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOkResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Response } from 'express';
 
+import { ConfigService } from '@nestjs/config';
+import { get } from 'env-var';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
-import { ConditionalHtmlExceptionsFilter } from '../common/conditional-html.filter';
 import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
 import { PrinterQueueService } from '../queue/printer-queue.service';
-import { PrintOutputType } from '../whatever/print-output-type.enum';
+import { RedisNotConfiguredException } from '../queue/redis.exception';
+import { CollectService } from './collect.service';
 import { PrintUrlCallbackOptionalDto } from './dto/print-url-callback-optional.dto';
+import { CollectDto } from './dto/print-url-optional.dto copy';
 
 const PRIORITY = 1;
-@Controller('print/:outputType/soon')
+
+@Controller('print/soon')
 @ApiTags('print/soon')
 export class PrintSoonController {
-  constructor(private readonly printerQueueService: PrinterQueueService) {}
+  private readonly logger = new Logger(PrintSoonController.name);
+
+  constructor(
+    private readonly printerQueueService: PrinterQueueService,
+    private readonly collectService: CollectService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post()
   @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(ConditionalHtmlExceptionsFilter)
   @ApiConsumes('text/html')
   @ApiBody({ required: false })
+  @ApiOkResponse({
+    description: 'Id of print job.',
+    type: PrintSoonCreateDto,
+  })
   async printSoonWithParamsPost(
-    @Param('outputType') outputType: PrintOutputType,
     @Query(new ValidationPipe({ transform: true }))
     {
+      outputType,
       url,
       additionalScripts,
       timeout,
@@ -45,6 +68,9 @@ export class PrintSoonController {
     }: PrintUrlCallbackOptionalDto,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
+    if (get('REDIS_URL').asUrlObject() === undefined)
+      throw new RedisNotConfiguredException();
+
     if (url === undefined && (typeof html !== 'string' || html === '')) {
       throw new BadRequestException(
         'You have to set either url or html parameter.',
@@ -75,13 +101,48 @@ export class PrintSoonController {
     return { id: job.id.toString() };
   }
 
-  @Get(':jobId')
+  @Get('/jobs/:jobId')
   @ApiSecurity('Api key')
   @UseGuards(ApiKeyAuthGuard)
-  @UseFilters(ConditionalHtmlExceptionsFilter)
+  @ApiOkResponse({
+    description: 'Object that contains print job status information.',
+    type: PrintSoonStatusDto,
+  })
   async getJobInfo(@Param('jobId') jobId: string): Promise<PrintSoonStatusDto> {
     const job = await this.printerQueueService.getPrintJob(jobId);
 
+    if (!job) throw new NotFoundException('Job not found');
+
     return this.printerQueueService.getPrintJobStatus(job);
+  }
+
+  @Get('/jobs/:jobId/collect')
+  @UseGuards(ApiKeyAuthGuard)
+  @ApiOkResponse({
+    description: 'PDF file or HTML string depending on the job output type.',
+  })
+  async getJobResult(
+    @Res({ passthrough: true }) response: Response,
+    @Param('jobId') jobId: string,
+    @Query(new ValidationPipe({ transform: true }))
+    { cleanupJob }: CollectDto,
+  ): Promise<StreamableFile | string> {
+    this.logger.log(`Collecting job ${jobId}`);
+
+    const job = await this.printerQueueService.getPrintJob(jobId);
+
+    if (!job) throw new NotFoundException('Job not found');
+
+    if (!(await job.isCompleted())) {
+      throw new BadRequestException('Job not finished yet');
+    }
+
+    return this.collectService.buildCollectResponse(
+      job.returnvalue,
+      this.configService.get<boolean>('cleanupJobAfterCollected') || cleanupJob
+        ? job
+        : null,
+      response,
+    );
   }
 }

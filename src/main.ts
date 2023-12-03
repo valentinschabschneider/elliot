@@ -49,6 +49,9 @@ async function bootstrap() {
 
   app.use(bodyParser.text({ type: 'text/html' }));
 
+  if (process.env.REDIS_URL === undefined)
+    logger.warn('No redis configured! Print soon feature unavailable.');
+
   await app.listen(parseInt(process.env.PORT, 10) || 3000);
 }
 bootstrap();

@@ -38,21 +38,7 @@ export class PrintPdfService implements IPrintService {
     return Array.from(file);
   }
 
-  public createResponse(
-    data: any,
-    download: boolean,
-    fileName: string,
-    response: Response,
-  ): StreamableFile {
-    if (download) {
-      response.attachment(fileName ?? 'document.pdf');
-    } else {
-      response.setHeader(
-        'Content-Disposition',
-        `filename="${fileName ?? 'document.pdf'}"`,
-      );
-    }
-
+  public createResponse(data: any, response: Response): StreamableFile {
     response.contentType('application/pdf');
 
     return new StreamableFile(Uint8Array.from(data));

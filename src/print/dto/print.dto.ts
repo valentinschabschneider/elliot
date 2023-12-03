@@ -1,10 +1,19 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform, Type } from 'class-transformer';
 import { IsArray, IsOptional, IsPositive } from 'class-validator';
-import { CollectDto } from './collect.dto';
+import { PrintOutputType } from '../../whatever/print-output-type.enum';
 
-// that extends is traaaaash
-export class PrintDto extends CollectDto {
+export class PrintDto {
+  @ApiProperty({
+    description: 'Type of the output.',
+    required: true,
+  })
+  outputType: PrintOutputType;
+  @ApiProperty({
+    description: 'Url of the page to be printed.',
+    required: false,
+  })
+  url?: string;
   @IsArray()
   @Transform(({ value }) =>
     Array.isArray(value) ? value : value === undefined ? [] : [value],

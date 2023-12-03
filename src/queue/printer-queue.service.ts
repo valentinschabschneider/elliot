@@ -5,6 +5,7 @@ import { Cron } from '@nestjs/schedule';
 import { Job, Queue } from 'bull';
 import { v4 as uuid } from 'uuid';
 
+import { get } from 'env-var';
 import { PrintOptions } from '../whatever/print-options.interface'; // TODO: mabye put somewhere else
 import { PrintStatus } from './print-status.interface';
 
@@ -55,11 +56,13 @@ export class PrinterQueueService {
 
   @Cron('0 * * * * *')
   handleCron() {
-    this.logger.log('Clean printer queue');
+    if (get('REDIS_URL').asUrlObject() !== undefined) {
+      this.logger.log('Clean printer queue');
 
-    this.printerQueue.clean(
-      this.configService.get<number>('persistPeriod'),
-      'completed',
-    );
+      this.printerQueue.clean(
+        this.configService.get<number>('persistPeriod'),
+        'completed',
+      );
+    }
   }
 }
