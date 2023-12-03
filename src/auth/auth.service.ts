@@ -6,6 +6,6 @@ export class AuthService {
   constructor(private readonly configService: ConfigService) {}
 
   public validateApiKey(apiKey: string) {
-    return this.configService.get<string>('secretKey') === apiKey;
+    return this.configService.get<string>('apiKey') === apiKey;
   }
 }

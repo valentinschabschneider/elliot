@@ -6,13 +6,13 @@ const logger = new Logger('AuthConfiguration');
 export default () => {
   const isProduction = get('NODE_ENV').required().asString() == 'production';
 
-  const secretKey = get('SECRET_KEY').asString();
+  const apiKey = get('API_KEY').asString();
 
-  if (isProduction && !secretKey) {
-    logger.warn('No SECRET_KEY configured in production mode!');
+  if (isProduction && !apiKey) {
+    logger.warn('No API_KEY configured in production mode!');
   }
 
   return {
-    secretKey,
+    apiKey,
   };
 };
