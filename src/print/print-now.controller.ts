@@ -111,7 +111,11 @@ export class PrintNowController {
         async (_) => null,
       );
 
-      return this.collectService.buildCollectResponse(data, null, response);
+      return this.collectService.buildCollectResponse(
+        { data, outputType },
+        null,
+        response,
+      );
     }
   }
 }
