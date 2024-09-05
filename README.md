@@ -39,8 +39,8 @@ Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
 
 | Name                        | Description                                                                                          | Required | Default |
 | --------------------------- | ---------------------------------------------------------------------------------------------------- | -------- | ------- |
-| REDIS_URL                   | Used for queue management.                                                                           | x        |         |
 | NODE_ENV                    | Already set inside the docker image.                                                                 | x        |         |
+| REDIS_URL                   | Used for queue management. If not set, print soon feature is unavailable.                            |          |         |
 | API_KEY                     | Highly recomended if not run in a private network.                                                   |          |         |
 | BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                         |          |         |
 | MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached. |          | 10000   |
