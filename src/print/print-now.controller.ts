@@ -76,7 +76,7 @@ export class PrintNowController {
     if (get('REDIS_URL').asUrlObject() !== undefined) {
       const job = await this.printerQueueService.addPrintJob(
         {
-          input: { url },
+          input: { url, html },
           outputType,
           additionalScripts,
           timeout,
@@ -103,7 +103,7 @@ export class PrintNowController {
       const printService = this.printServiceFactory.create(outputType);
 
       const data = await printService.print(
-        { url },
+        { url, html },
         additionalScripts,
         timeout,
         injectPolyfill,

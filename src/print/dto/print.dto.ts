@@ -13,6 +13,7 @@ export class PrintDto {
     description: 'Url of the page to be printed.',
     required: false,
   })
+  @IsOptional()
   url?: string;
   @IsArray()
   @Transform(({ value }) =>
