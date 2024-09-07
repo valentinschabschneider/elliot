@@ -29,27 +29,22 @@ URL's (file paths with the `file://` protocol as well) and raw HTML are supporte
 
 Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of what the generated PDF would look like.
 
-### Error handling
-
-Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
-
 ## Configuration
 
 ### Environment variables
 
-| Name                        | Description                                                                                          | Required | Default |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- | -------- | ------- |
-| NODE_ENV                    | Already set inside the docker image.                                                                 | x        |         |
-| REDIS_URL                   | Used for queue management. If not set, print soon feature is unavailable.                            |          |         |
-| API_KEY                     | Highly recomended if not run in a private network.                                                   |          |         |
-| BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                         |          |         |
-| MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached. |          | 10000   |
-| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds if not cleaned up on collect.             |          | 3600000 |
-| ADDITIONAL_SCRIPTS          | Additional js code that will be run in every print. Very useful for handlers.                        |          | []      |
-| HTTP_HEADERS                | HTTP headers that will be set on the get request for the page to be printed.                         |          | []      |
-| CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                           |          | false   |
-| ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                          |          | false   |
-| DEBUG                       | This is passed to pagedjs-cli.                                                                       |          | false   |
+| Name                        | Description                                                                                          | Default |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- | ------- |
+| REDIS_URL                   | Used for queue management. If not set, print soon feature is unavailable.                            |         |
+| API_KEY                     | Highly recomended if not run in a private network.                                                   |         |
+| BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                         |         |
+| MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached. | 10000   |
+| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds if not cleaned up on collect.             | 3600000 |
+| ADDITIONAL_SCRIPTS          | Additional js code that will be run in every print. Very useful for handlers.                        | []      |
+| HTTP_HEADERS                | HTTP headers that will be set on the get request for the page to be printed.                         | []      |
+| CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                           | false   |
+| ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                          | false   |
+| DEBUG                       | This is passed to pagedjs-cli.                                                                       | false   |
 
 ## General info
 
@@ -58,7 +53,7 @@ The main difference is that you can skip the polyfill script injection. This all
 
 ### Included static files
 
-For your convenience Elliot exposes a view static files that can come in handy (preview styles / handlers). You can find them under [/src/static](/src/static) which is also exposed under `/static` when hosted. View the demo sources to see how to use them.
+For your convenience Elliot exposes a view static files that can come in handy (preview styles / handlers / text rendering fixes). You can find them under [/src/static](/src/static) which is also exposed under `/static` when hosted. View the demo sources to see how to use them.
 
 ## Contribute
 

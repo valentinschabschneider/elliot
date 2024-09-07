@@ -220,6 +220,11 @@ class Printer extends EventEmitter {
       await page
         .evaluate(async () => {
           let done;
+
+          if (window.PagedPolyfill === undefined) {
+            throw new Error('Polyfill not found');
+          }
+
           window.PagedPolyfill.on('page', (page) => {
             const {
               id,

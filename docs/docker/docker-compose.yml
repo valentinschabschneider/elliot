@@ -3,7 +3,6 @@ services:
   elliot:
     image: valentinschabschneider/elliot:0.2.0
     environment:
-      NODE_ENV: ${ENVIRONMENT}
       MAX_TIMEOUT: ${MAX_TIMEOUT}
       PERSIST_PERIOD: ${PERSIST_PERIOD}
       QUEUE_CONCURRENCY: ${QUEUE_CONCURRENCY}
