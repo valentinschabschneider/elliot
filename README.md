@@ -29,10 +29,6 @@ URL's (file paths with the `file://` protocol as well) and raw HTML are supporte
 
 Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of what the generated PDF would look like.
 
-### Error handling
-
-Set the header `X-JSON-ERROR-RESPONSE` to recieve errors as a JSON response.
-
 ## Configuration
 
 ### Environment variables

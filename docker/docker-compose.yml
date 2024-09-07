@@ -2,7 +2,9 @@ version: '3'
 services:
   elliot:
     image: valentinschabschneider/elliot
-    build: .
+    build:
+      context: ../
+      dockerfile: standalone.Dockerfile
     environment:
       NODE_ENV: development
       REDIS_URL: redis://redis:6379
