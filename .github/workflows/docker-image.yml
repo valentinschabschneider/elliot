@@ -64,10 +64,6 @@ jobs:
         with:
           target: valentinschabschneider/elliot:latest
           tag: slim
-      - name: Re-tag slim image
-        if: github.event_name != 'pull_request'
-        run: |
-          docker tag valentinschabschneider/elliot:slim ${{ steps.slimtag.outputs.tag }}-slim
       - name: Re-tag and push slimmed image for all tags
         if: github.event_name != 'pull_request'
         run: |
