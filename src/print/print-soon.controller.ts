@@ -22,7 +22,6 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import { Headers } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { get } from 'env-var';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
@@ -30,7 +29,6 @@ import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
 import { PrinterQueueService } from '../queue/printer-queue.service';
 import { RedisNotConfiguredException } from '../queue/redis.exception';
-import { PrintOutputType } from '../whatever/print-output-type.enum';
 import { CollectService } from './collect.service';
 import { PrintUrlCallbackOptionalDto } from './dto/print-url-callback-optional.dto';
 import { CollectDto } from './dto/print-url-optional.dto copy';
@@ -60,6 +58,7 @@ export class PrintSoonController {
   async printSoonWithParamsPost(
     @Query(new ValidationPipe({ transform: true }))
     {
+      outputType,
       url,
       additionalScripts,
       timeout,
@@ -67,7 +66,6 @@ export class PrintSoonController {
       httpHeaders,
       callbackUrl,
     }: PrintUrlCallbackOptionalDto,
-    @Headers('content-type') contentType: string,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
     if (get('REDIS_URL').asUrlObject() === undefined)
@@ -86,9 +84,6 @@ export class PrintSoonController {
         html = undefined;
       }
     }
-
-    const outputType =
-      contentType === 'text/html' ? PrintOutputType.HTML : PrintOutputType.PDF; // TODO: add exception for other content types
 
     const job = await this.printerQueueService.addPrintJob(
       {
