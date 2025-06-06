@@ -1,7 +1,7 @@
 version: '3'
 services:
   elliot:
-    image: valentinschabschneider/elliot:0.2.0
+    image: valentinschabschneider/elliot:0.6.0
     environment:
       MAX_TIMEOUT: ${MAX_TIMEOUT}
       PERSIST_PERIOD: ${PERSIST_PERIOD}
@@ -9,7 +9,8 @@ services:
       ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
       API_KEY: ${API_KEY}
       REDIS_URL: redis://redis:6379
-      BROWSERLESS_ENDPOINT: ws://browserless:3000?token=${BROWSERLESS_TOKEN}
+      BROWSERLESS_ENDPOINT: ws://browserless:3000/chrome?token=${BROWSERLESS_TOKEN}
+      BULL_BOARD_PASSWORD: ${BULL_BOARD_PASSWORD}
     ports:
       - 3000:3000
     depends_on:
@@ -18,13 +19,13 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
     volumes:
       - redis-data:/data
     restart: unless-stopped
 
   browserless:
-    image: browserless/chrome:1.60-puppeteer-19.7.5
+    image: ghcr.io/browserless/chrome:v2.31.0
     environment:
       MAX_CONCURRENT_SESSIONS: 10
       CONNECTION_TIMEOUT: 60000
