@@ -10,8 +10,6 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 RUN yarn install
 
-COPY printer.js "./node_modules/pagedjs-cli/src/printer.js"
-
 FROM base as build
 
 COPY . .

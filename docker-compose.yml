@@ -15,7 +15,7 @@ services:
       - browserless
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:7.4-alpine
 
   browserless:
-    image: browserless/chrome:1.60-puppeteer-19.7.5
+    image: ghcr.io/browserless/chrome:v2.31.0

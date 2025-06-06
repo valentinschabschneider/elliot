@@ -2,6 +2,9 @@ import EventEmitter from 'events';
 import puppeteer from 'puppeteer';
 
 import fs from 'fs';
+import { cp, mkdtemp } from 'fs/promises';
+import { join } from 'node:path';
+import { tmpdir } from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -22,7 +25,7 @@ class Printer extends EventEmitter {
     super();
 
     this.debug = typeof options.debug !== 'undefined' ? options.debug : false;
-    this.headless = options.headless !== false;
+    this.headless = options.headless !== false ? 'new' : false;
     this.allowLocal = options.allowLocal || false;
     this.allowRemote =
       typeof options.allowRemote !== 'undefined' ? options.allowRemote : true;
@@ -40,8 +43,8 @@ class Printer extends EventEmitter {
     this.emulateMedia = options.emulateMedia || 'print';
     this.styles = options.styles || [];
     this.enableWarnings = options.enableWarnings || false;
-    this.extraHTTPHeaders = options.extraHTTPHeaders || {};
     this.disableScriptInjection = options.disableScriptInjection || false;
+    this.extraHTTPHeaders = options.extraHTTPHeaders || {};
 
     this.pages = [];
 
@@ -52,11 +55,23 @@ class Printer extends EventEmitter {
   }
 
   async setup() {
+    let tmpDir = await mkdtemp(join(tmpdir(), 'pagedjs-'));
+
     let puppeteerOptions = {
       headless: this.headless,
-      args: ['--disable-dev-shm-usage', '--export-tagged-pdf'],
+      args: [],
       ignoreHTTPSErrors: this.ignoreHTTPSErrors,
+      userDataDir: tmpDir,
     };
+
+    if (process.platform === 'linux') {
+      cp(
+        path.resolve(path.dirname(currentPath), '../docker-userdata'),
+        tmpDir,
+        { recursive: true },
+      );
+      puppeteerOptions.ignoreDefaultArgs = ['--disable-component-update'];
+    }
 
     if (this.allowLocal) {
       puppeteerOptions.args.push('--allow-file-access-from-files');
@@ -189,13 +204,13 @@ class Printer extends EventEmitter {
 
       for (const style of this.styles) {
         await page.addStyleTag({
-          path: style,
+          [this.isUrl(style) ? 'url' : 'path']: style,
         });
       }
 
       for (const script of this.additionalScripts) {
         await page.addScriptTag({
-          url: script,
+          [this.isUrl(script) ? 'url' : 'path']: script,
         });
       }
 
@@ -441,6 +456,15 @@ class Printer extends EventEmitter {
       return true;
     }
     return this.allowedDomains.includes(domain);
+  }
+
+  isUrl(resource) {
+    try {
+      new URL(resource);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
