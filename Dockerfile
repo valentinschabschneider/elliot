@@ -1,6 +1,6 @@
 ARG NODE_BASE_IMAGE=node:24.1.0-alpine
 
-FROM $NODE_BASE_IMAGE as base
+FROM $NODE_BASE_IMAGE AS base
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 RUN yarn install
 
-FROM base as build
+FROM base AS build
 
 COPY . .
 
@@ -24,7 +24,7 @@ RUN rm -rf node_modules/rxjs/_esm5/
 RUN rm -rf node_modules/rxjs_esm2015/
 RUN rm -rf node_modules/swagger-ui-dist/*.map
 
-FROM gcr.io/distroless/nodejs24-debian12 as deploy
+FROM gcr.io/distroless/nodejs24-debian12 AS deploy
 
 WORKDIR /usr/src/app
 
