@@ -1,4 +1,4 @@
-ARG NODE_BASE_IMAGE=node:19.0.0-alpine3.16
+ARG NODE_BASE_IMAGE=node:24.1.0-alpine
 
 FROM $NODE_BASE_IMAGE as base
 
@@ -24,7 +24,7 @@ RUN rm -rf node_modules/rxjs/_esm5/
 RUN rm -rf node_modules/rxjs_esm2015/
 RUN rm -rf node_modules/swagger-ui-dist/*.map
 
-FROM gcr.io/distroless/nodejs18-debian11 as deploy
+FROM gcr.io/distroless/nodejs24-debian12 as deploy
 
 WORKDIR /usr/src/app
 
