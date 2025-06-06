@@ -14,13 +14,13 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 RUN --mount=type=cache,id=s/a9650354-4631-43f2-a069-a098c18071b9-pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
+# RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
 
-RUN rm -rf node_modules/rxjs/src/
-RUN rm -rf node_modules/rxjs/bundles/
-RUN rm -rf node_modules/rxjs/_esm5/
-RUN rm -rf node_modules/rxjs_esm2015/
-RUN rm -rf node_modules/swagger-ui-dist/*.map
+# RUN rm -rf node_modules/rxjs/src/
+# RUN rm -rf node_modules/rxjs/bundles/
+# RUN rm -rf node_modules/rxjs/_esm5/
+# RUN rm -rf node_modules/rxjs_esm2015/
+# RUN rm -rf node_modules/swagger-ui-dist/*.map
 
 FROM base AS build
 
