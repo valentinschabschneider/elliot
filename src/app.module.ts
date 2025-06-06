@@ -7,7 +7,7 @@ import { BullBoardModule } from '@bull-board/nestjs';
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
 import { get } from 'env-var';
-import basicAuth from 'express-basic-auth';
+import * as basicAuth from 'express-basic-auth';
 import { AuthModule } from './auth/auth.module';
 import { PagedjsModule } from './pagedjs/pagedjs.module';
 import { PreviewModule } from './preview/preview.module';
