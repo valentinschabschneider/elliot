@@ -28,9 +28,8 @@ export class CallbackQueueConsumer {
 
     this.logger.log(`Sending callback ${printJob.data.callbackUrl}`);
 
-    const printJobStatus = await this.printerQueueService.getPrintJobStatus(
-      printJob,
-    );
+    const printJobStatus =
+      await this.printerQueueService.getPrintJobStatus(printJob);
 
     await lastValueFrom(
       this.httpService.post(

@@ -1,11 +1,7 @@
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { ExpressAdapter } from '@bull-board/express';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
-import { Queue } from 'bull';
 
 import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -35,16 +31,6 @@ async function bootstrap() {
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
-
-    // -----------------
-
-    const serverAdapter = new ExpressAdapter();
-    serverAdapter.setBasePath('/bull-board');
-    createBullBoard({
-      queues: [new BullMQAdapter(app.get<Queue>(`BullQueue_printer`))],
-      serverAdapter,
-    });
-    app.use('/bull-board', serverAdapter.getRouter());
   }
 
   app.use(bodyParser.text({ type: 'text/html' }));

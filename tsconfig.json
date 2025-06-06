@@ -17,7 +17,7 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "moduleResolution": "node16"
+    "moduleResolution": "node"
   },
   "watchOptions": {
     "watchFile": "dynamicPriorityPolling",

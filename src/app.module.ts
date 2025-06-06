@@ -2,9 +2,12 @@ import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
+import { ExpressAdapter } from '@bull-board/express';
+import { BullBoardModule } from '@bull-board/nestjs';
 import { BullModule } from '@nestjs/bull';
 import { ScheduleModule } from '@nestjs/schedule';
 import { get } from 'env-var';
+import basicAuth from 'express-basic-auth';
 import { AuthModule } from './auth/auth.module';
 import { PagedjsModule } from './pagedjs/pagedjs.module';
 import { PreviewModule } from './preview/preview.module';
@@ -27,15 +30,15 @@ import { WhateverModule } from './whatever/whatever.module';
     PreviewModule,
     PagedjsModule,
     BullModule.forRoot({
-      redis:
-        get('REDIS_URL').asUrlObject() !== undefined
-          ? {
-              host: get('REDIS_URL').asUrlObject().hostname,
-              password: get('REDIS_URL').asUrlObject().password,
-              port: Number(get('REDIS_URL').asUrlObject().port),
-              username: get('REDIS_URL').asUrlObject().username,
-            }
-          : null, // TODO: better?
+      url: get('REDIS_URL') ? get('REDIS_URL').asUrlString() : null,
+    }),
+    BullBoardModule.forRoot({
+      route: '/bull-board',
+      adapter: ExpressAdapter,
+      middleware: basicAuth({
+        challenge: true,
+        users: { admin: get('BULL_BOARD_PASSWORD').asString() },
+      }),
     }),
     QueueModule,
     WhateverModule,

@@ -10,11 +10,17 @@ export class ApiKeyStrategy extends PassportStrategy(
   'api-key',
 ) {
   constructor(private readonly authService: AuthService) {
-    super({ header: 'X-API-KEY' }, true, async (apiKey, done, req) => {
-      if (this.authService.validateApiKey(apiKey)) {
-        done(null, true);
-      }
-      done(new UnauthorizedException(), null);
-    });
+    super(
+      { header: 'X-API-KEY', prefix: '' }, // options
+      false, // passReqToCallback
+    );
+  }
+
+  async validate(apiKey: string, done: (err: any, user?: any) => void) {
+    const user = await this.authService.validateApiKey(apiKey);
+    if (!user) {
+      return done(new UnauthorizedException(), null);
+    }
+    return done(null, user);
   }
 }

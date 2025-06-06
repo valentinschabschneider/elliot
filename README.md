@@ -45,6 +45,7 @@ Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of
 | CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                           | false   |
 | ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                          | false   |
 | DEBUG                       | This is passed to pagedjs-cli.                                                                       | false   |
+| BULL_BOARD_PASSWORD         | Basic-Auth password for the queues dashboard                                                         |         |
 
 ## General info
 
