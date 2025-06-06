@@ -6,3 +6,5 @@ onlyBuiltDependencies:
   - msgpackr-extract
   - postinstall-postinstall
   - puppeteer
+patchedDependencies:
+  pagedjs-cli@0.4.3: patches/pagedjs-cli@0.4.3.patch

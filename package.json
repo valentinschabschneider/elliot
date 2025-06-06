@@ -17,8 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "postinstall": "patch-package"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@bull-board/api": "^6.9.6",
@@ -46,7 +45,6 @@
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "passport-headerapikey": "^1.2.2",
-    "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
     "puppeteer-core": "^24.10.0",
     "reflect-metadata": "^0.2.2",

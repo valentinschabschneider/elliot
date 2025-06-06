@@ -1,8 +1,8 @@
-diff --git a/node_modules/pagedjs-cli/src/printer.js b/node_modules/pagedjs-cli/src/printer.js
-index 206b4fc..212e56f 100644
---- a/node_modules/pagedjs-cli/src/printer.js
-+++ b/node_modules/pagedjs-cli/src/printer.js
-@@ -1,403 +1,471 @@
+diff --git a/src/printer.js b/src/printer.js
+index 206b4fcad71822e5c92b36fb469346a4cdd56bfb..9aaaabaf5fe17a0e47addda01a622a87e0e0aa89 100644
+--- a/src/printer.js
++++ b/src/printer.js
+@@ -1,403 +1,460 @@
 -import EventEmitter from "events";
 -import puppeteer from "puppeteer";
 +import EventEmitter from 'events';
@@ -12,9 +12,6 @@ index 206b4fc..212e56f 100644
 -import fs from "fs";
 -import { fileURLToPath } from "url";
 +import fs from 'fs';
-+import { cp, mkdtemp } from 'fs/promises';
-+import { join } from 'node:path';
-+import { tmpdir } from 'os';
 +import path from 'path';
 +import { fileURLToPath } from 'url';
  
@@ -452,21 +449,13 @@ index 206b4fc..212e56f 100644
 +  }
 +
 +  async setup() {
-+    let tmpDir = await mkdtemp(join(tmpdir(), 'pagedjs-'));
-+
 +    let puppeteerOptions = {
 +      headless: this.headless,
 +      args: [],
 +      ignoreHTTPSErrors: this.ignoreHTTPSErrors,
-+      userDataDir: tmpDir,
 +    };
 +
 +    if (process.platform === 'linux') {
-+      cp(
-+        path.resolve(path.dirname(currentPath), '../docker-userdata'),
-+        tmpDir,
-+        { recursive: true },
-+      );
 +      puppeteerOptions.ignoreDefaultArgs = ['--disable-component-update'];
 +    }
 +
