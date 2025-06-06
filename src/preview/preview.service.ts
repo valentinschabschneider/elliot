@@ -2,7 +2,10 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 import { Injectable, Logger } from '@nestjs/common';
-import { FrameAddScriptTagOptions, FrameAddStyleTagOptions } from 'puppeteer';
+import {
+  FrameAddScriptTagOptions,
+  FrameAddStyleTagOptions,
+} from 'puppeteer-core';
 
 @Injectable()
 export class PreviewService {

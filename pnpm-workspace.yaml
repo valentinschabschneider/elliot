@@ -1,0 +1,8 @@
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - core-js
+  - es5-ext
+  - msgpackr-extract
+  - postinstall-postinstall
+  - puppeteer

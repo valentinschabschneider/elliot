@@ -1,7 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Printer, PrinterOptions, RenderInput } from 'pagedjs-cli';
-import { FrameAddScriptTagOptions, FrameAddStyleTagOptions } from 'puppeteer';
+import {
+  FrameAddScriptTagOptions,
+  FrameAddStyleTagOptions,
+} from 'puppeteer-core';
 
 import { PagedJsException } from './pagedjs.exception';
 import { PrintStep } from './print-step.enum';

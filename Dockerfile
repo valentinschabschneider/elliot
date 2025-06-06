@@ -1,20 +1,18 @@
-ARG NODE_BASE_IMAGE=node:24.1.0-alpine
-
-FROM $NODE_BASE_IMAGE AS base
+FROM node:24-alpine AS base
 
 WORKDIR /usr/src/app
 
-COPY package.json yarn.lock ./
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-RUN yarn install
-
-FROM base AS build
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 COPY . .
 
-RUN yarn build
+FROM base AS prod-deps
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
 
@@ -24,12 +22,19 @@ RUN rm -rf node_modules/rxjs/_esm5/
 RUN rm -rf node_modules/rxjs_esm2015/
 RUN rm -rf node_modules/swagger-ui-dist/*.map
 
+FROM base AS build
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
+
 FROM gcr.io/distroless/nodejs24-debian12 AS deploy
 
 WORKDIR /usr/src/app
 
+COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/node_modules ./node_modules
 
 ENV NODE_ENV=production
 
