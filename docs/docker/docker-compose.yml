@@ -1,6 +1,6 @@
 services:
   elliot:
-    image: valentinschabschneider/elliot:0.6.0
+    image: valentinschabschneider/elliot:0.6.1
     environment:
       MAX_TIMEOUT: ${MAX_TIMEOUT}
       PERSIST_PERIOD: ${PERSIST_PERIOD}
