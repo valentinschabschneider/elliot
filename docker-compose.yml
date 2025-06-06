@@ -6,7 +6,7 @@ services:
     environment:
       NODE_ENV: development
       REDIS_URL: redis://redis:6379
-      BROWSERLESS_ENDPOINT: ws://browserless:3000
+      BROWSERLESS_ENDPOINT: ws://browserless:3000/chrome
       ENABLE_DASHBOARDS: true
     ports:
       - 3000:3000
