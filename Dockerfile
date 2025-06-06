@@ -8,11 +8,11 @@ RUN corepack enable
 
 COPY . .
 
-FROM base AS prod-deps
+# FROM base AS prod-deps
 
-ENV PUPPETEER_SKIP_DOWNLOAD=true
+# ENV PUPPETEER_SKIP_DOWNLOAD=true
 
-RUN --mount=type=cache,id=s/a9650354-4631-43f2-a069-a098c18071b9-pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+# RUN --mount=type=cache,id=s/a9650354-4631-43f2-a069-a098c18071b9-pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 # RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
 
@@ -33,7 +33,7 @@ FROM gcr.io/distroless/nodejs24-debian12 AS deploy
 
 WORKDIR /usr/src/app
 
-COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
 ENV NODE_ENV=production
