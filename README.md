@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="docs/logo.svg" alt="elliot logo" height="250px" />
+	<img src="docs/logo.png" alt="elliot logo" height="250px" />
 </p>
 
 # Elliot
