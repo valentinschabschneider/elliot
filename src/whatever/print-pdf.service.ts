@@ -3,6 +3,7 @@ import { Response } from 'express';
 
 import { PagedJsService } from '../pagedjs/pagedjs.service';
 import { PrintStep } from '../pagedjs/print-step.enum';
+import { CookieDto } from '../print/dto/print.dto';
 import { PrintInput } from './print-input.interface';
 import { IPrintService } from './print.service.interface';
 
@@ -18,6 +19,7 @@ export class PrintPdfService implements IPrintService {
     timeout: number,
     injectPolyfill: boolean,
     httpHeaders: Record<string, string>[],
+    cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<Array<number>> {
     const file = await this.pagedjsService.printPdf(
@@ -29,6 +31,7 @@ export class PrintPdfService implements IPrintService {
           closeAfter: true,
           disableScriptInjection: !injectPolyfill,
           extraHttpHeaders: httpHeaders,
+          extraCookies: cookies.map((cookie) => cookie.toPuppeteerCookie()),
         },
         currentStepCallback,
       ),

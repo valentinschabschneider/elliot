@@ -38,6 +38,7 @@ export class PrinterQueueConsumer {
       job.data.timeout,
       job.data.injectPolyfill,
       job.data.httpHeaders,
+      job.data.cookies,
       async (step: PrintStep) => await job.progress(step.toString()),
     );
 

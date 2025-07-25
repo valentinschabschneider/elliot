@@ -27,7 +27,7 @@ async function bootstrap() {
       .setTitle('Elliot example')
       .setDescription('The elliot API description')
       .setVersion(process.env.npm_package_version)
-      .addApiKey({ type: 'apiKey', name: 'api-key', in: 'header' }, 'Api key')
+      .addApiKey({ type: 'apiKey', name: 'X-API-KEY', in: 'header' }, 'Api key')
       .build();
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);

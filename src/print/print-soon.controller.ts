@@ -31,7 +31,7 @@ import { PrinterQueueService } from '../queue/printer-queue.service';
 import { RedisNotConfiguredException } from '../queue/redis.exception';
 import { CollectService } from './collect.service';
 import { PrintUrlCallbackOptionalDto } from './dto/print-url-callback-optional.dto';
-import { CollectDto } from './dto/print-url-optional.dto copy';
+import { CollectDto } from './dto/print-url-optional.dto';
 
 const PRIORITY = 1;
 
@@ -64,6 +64,7 @@ export class PrintSoonController {
       timeout,
       injectPolyfill,
       httpHeaders,
+      cookies,
       callbackUrl,
     }: PrintUrlCallbackOptionalDto,
     @Body() html?: string,
@@ -94,6 +95,7 @@ export class PrintSoonController {
         injectPolyfill,
         httpHeaders,
         callbackUrl,
+        cookies,
       },
       PRIORITY,
     );

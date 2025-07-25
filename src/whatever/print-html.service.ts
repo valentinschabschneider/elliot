@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { PagedJsService } from '../pagedjs/pagedjs.service';
 import { PrintStep } from '../pagedjs/print-step.enum';
 import { PreviewService } from '../preview/preview.service';
+import { CookieDto } from '../print/dto/print.dto';
 import { PrintInput } from './print-input.interface';
 import { PrintMedia } from './print-media.enum';
 import { IPrintService } from './print.service.interface';
@@ -23,6 +24,7 @@ export class PrintHtmlService implements IPrintService {
     timeout: number,
     injectPolyfill: boolean,
     httpHeaders: Record<string, string>[],
+    cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<string> {
     const preview = true;
@@ -40,6 +42,7 @@ export class PrintHtmlService implements IPrintService {
           closeAfter: false,
           disableScriptInjection: !injectPolyfill,
           extraHttpHeaders: httpHeaders,
+          extraCookies: cookies.map((cookie) => cookie.toPuppeteerCookie()),
         },
         currentStepCallback,
       ),

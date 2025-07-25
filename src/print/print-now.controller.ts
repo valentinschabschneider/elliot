@@ -56,6 +56,7 @@ export class PrintNowController {
       timeout,
       injectPolyfill,
       httpHeaders,
+      cookies,
     }: PrintDto,
     @Body() html: string,
   ): Promise<StreamableFile | string> {
@@ -82,6 +83,7 @@ export class PrintNowController {
           timeout,
           injectPolyfill,
           httpHeaders,
+          cookies,
         },
         PRIORITY,
       );
@@ -108,6 +110,7 @@ export class PrintNowController {
         timeout,
         injectPolyfill,
         httpHeaders,
+        cookies,
         async (_) => null,
       );
 
