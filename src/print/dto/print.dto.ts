@@ -73,29 +73,6 @@ export class CookieDto {
     return parsed;
   }
 
-  toPuppeteerCookie(url?: string): Record<string, any> {
-    if (!this.name || this.value === undefined) {
-      throw new Error('Cookie must have a name and value');
-    }
-
-    const cookie: Record<string, any> = {
-      name: this.name,
-      value: this.value,
-    };
-
-    if (url) cookie.url = url;
-    if (this.domain) cookie.domain = this.domain;
-    if (this.path) cookie.path = this.path;
-    if (this.secure !== undefined) cookie.secure = this.secure;
-    if (this.httpOnly !== undefined) cookie.httpOnly = this.httpOnly;
-    if (this.sameSite) cookie.sameSite = this.sameSite;
-    if (this.expires instanceof Date)
-      cookie.expires = Math.floor(this.expires.getTime() / 1000);
-    else if (typeof this.expires === 'number') cookie.expires = this.expires;
-
-    return cookie;
-  }
-
   @IsOptional()
   @IsString()
   @ApiPropertyOptional({ description: 'Cookie name' })
@@ -192,8 +169,8 @@ export class PrintDto {
     const headers: string[] = Array.isArray(value)
       ? value
       : value === undefined
-      ? []
-      : [value];
+        ? []
+        : [value];
 
     return headers.reduce((acc, header) => {
       const [name, ...value] = header.split(':');
@@ -212,8 +189,8 @@ export class PrintDto {
     const cookieStrings = Array.isArray(value)
       ? value
       : value === undefined
-      ? []
-      : [value];
+        ? []
+        : [value];
 
     return cookieStrings.map((cookieStr) => new CookieDto(cookieStr));
   })

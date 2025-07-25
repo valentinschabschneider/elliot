@@ -9,6 +9,24 @@ import {
 import { PagedJsException } from './pagedjs.exception';
 import { PrintStep } from './print-step.enum';
 
+function toPuppeteerCookie(cookieObj: any): Record<string, any> {
+  const cookie: Record<string, any> = {
+    name: cookieObj.name,
+    value: cookieObj.value,
+  };
+
+  if (cookieObj.domain) cookie.domain = cookieObj.domain;
+  if (cookieObj.path) cookie.path = cookieObj.path;
+  if (cookieObj.secure !== undefined) cookie.secure = cookieObj.secure;
+  if (cookieObj.httpOnly !== undefined) cookie.httpOnly = cookieObj.httpOnly;
+  if (cookieObj.sameSite) cookie.sameSite = cookieObj.sameSite;
+  if (cookieObj.expires instanceof Date)
+    cookie.expires = Math.floor(cookieObj.expires.getTime() / 1000);
+  else if (typeof cookieObj.expires === 'number') cookie.expires = this.expires;
+
+  return cookie;
+}
+
 @Injectable()
 export class PagedJsService {
   private readonly logger = new Logger(PagedJsService.name);
@@ -72,9 +90,8 @@ export class PagedJsService {
       );
     }
 
-    printerOptions.extraCookies = printerOptions.extraCookies.map((cookie) =>
-      cookie.toPuppeteerCookie(),
-    );
+    printerOptions.extraCookies =
+      printerOptions.extraCookies.map(toPuppeteerCookie);
 
     const printer = new this.CPrinter(printerOptions);
 

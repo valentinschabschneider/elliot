@@ -105,8 +105,8 @@ export class PrintSoonController {
         timeout,
         injectPolyfill,
         httpHeaders,
-        callbackUrl,
         cookies,
+        callbackUrl,
       },
       PRIORITY,
     );
