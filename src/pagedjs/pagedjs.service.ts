@@ -51,15 +51,21 @@ export class PagedJsService {
       );
     }
 
-    printerOptions.extraHttpHeaders = [
-      ...(printerOptions.extraHttpHeaders ?? []),
+    printerOptions.extraHTTPHeaders = [
+      ...(printerOptions.extraHTTPHeaders ?? []),
       ...this.configService.get<string[]>('httpHeaders'),
-    ];
+    ].reduce((acc, header) => {
+      const [name, value] = header.split(':').map((s) => s.trim());
+      if (name && value) {
+        acc[name] = value;
+      }
+      return acc;
+    });
 
-    if (printerOptions.extraHttpHeaders.length > 0) {
+    if (printerOptions.extraHTTPHeaders.length > 0) {
       this.logger.log(
         'Will add http headers: ' +
-          JSON.stringify(printerOptions.extraHttpHeaders),
+          JSON.stringify(printerOptions.extraHTTPHeaders),
       );
     }
 

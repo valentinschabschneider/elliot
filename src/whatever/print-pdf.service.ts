@@ -30,7 +30,7 @@ export class PrintPdfService implements IPrintService {
           timeout,
           closeAfter: true,
           disableScriptInjection: !injectPolyfill,
-          extraHttpHeaders: httpHeaders,
+          extraHTTPHeaders: httpHeaders,
           extraCookies: cookies.map((cookie) => cookie.toPuppeteerCookie()),
         },
         currentStepCallback,

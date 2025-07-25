@@ -1,5 +1,5 @@
 diff --git a/src/printer.js b/src/printer.js
-index 206b4fcad71822e5c92b36fb469346a4cdd56bfb..1118731ed46b0cea41aa04d3e4ff62fc0c551e6f 100644
+index 206b4fcad71822e5c92b36fb469346a4cdd56bfb..72f4844aa5232b1970bfb040f730db46fc044d22 100644
 --- a/src/printer.js
 +++ b/src/printer.js
 @@ -1,403 +1,467 @@
@@ -198,9 +198,9 @@ index 206b4fcad71822e5c92b36fb469346a4cdd56bfb..1118731ed46b0cea41aa04d3e4ff62fc
 +      const page = await this.browser.newPage();
 +      page.setDefaultTimeout(this.timeout);
 +
-+      page.setExtraHTTPHeaders(this.extraHTTPHeaders);
++      await page.setExtraHTTPHeaders(this.extraHTTPHeaders);
 + 
-+			page.setCookie(...this.extraCookies);
++			await page.setCookie(...this.extraCookies);
 +
 +      await page.emulateMediaType(this.emulateMedia);
 +
