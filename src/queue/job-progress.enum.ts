@@ -3,5 +3,5 @@ export enum JobProgress {
   RENDERING = 'rendering',
   GENERATING = 'generating',
   POST_PROCESSING = 'postprocessing',
-  FINISHED = 'finished',
+  COMPLETED = 'completed',
 }

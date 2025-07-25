@@ -36,6 +36,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { get } from 'env-var';
 import { ApiKeyAuthGuard } from '../auth/api-key-auth.guard';
+import { JobProgress } from '../queue/job-progress.enum';
 import { PrintSoonCreateDto } from '../queue/print-soon-create.dto';
 import { PrintSoonStatusDto } from '../queue/print-soon-status.dto';
 import { PrinterQueueService } from '../queue/printer-queue.service';
@@ -161,7 +162,10 @@ export class PrintSoonController {
         ),
       ),
       filter((status): status is PrintSoonStatusDto => status !== null),
-      takeWhile((status) => status.state !== 'finished' && !status.error, true),
+      takeWhile(
+        (status) => status.state !== JobProgress.COMPLETED && !status.error,
+        true,
+      ),
       map(
         (status): MessageEvent => ({
           data: status,
