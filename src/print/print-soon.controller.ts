@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   Res,
+  Sse,
   StreamableFile,
   UseGuards,
   ValidationPipe,
@@ -21,6 +22,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
+import {
+  Observable,
+  concatMap,
+  filter,
+  from,
+  interval,
+  map,
+  takeWhile,
+} from 'rxjs';
 
 import { ConfigService } from '@nestjs/config';
 import { get } from 'env-var';
@@ -116,6 +126,45 @@ export class PrintSoonController {
     if (!job) throw new NotFoundException('Job not found');
 
     return this.printerQueueService.getPrintJobStatus(job);
+  }
+
+  @Sse('/jobs/:jobId/listen')
+  // @ApiSecurity('Api key')
+  // @UseGuards(ApiKeyAuthGuard) // TODO: implement api key as query param
+  @ApiOkResponse({
+    description: 'Object that contains print job status information.',
+    type: PrintSoonStatusDto,
+  })
+  async listenJobInfo(
+    @Param('jobId') jobId: string,
+  ): Promise<Observable<PrintSoonStatusDto>> {
+    const job = await this.printerQueueService.getPrintJob(jobId);
+
+    if (!job) throw new NotFoundException('Job not found');
+
+    let lastStatus: PrintSoonStatusDto | undefined;
+
+    return interval(500).pipe(
+      concatMap(() =>
+        from(this.printerQueueService.getPrintJobStatus(job)).pipe(
+          map((status) => {
+            if (
+              status.state === lastStatus?.state &&
+              status.error === lastStatus?.error
+            )
+              return null;
+
+            lastStatus = status;
+            return status;
+          }),
+        ),
+      ),
+      filter((status): status is PrintSoonStatusDto => status !== null),
+      takeWhile(
+        (status) => status.state !== 'finished' && !status.error,
+        true, // include the final status or error
+      ),
+    );
   }
 
   @Get('/jobs/:jobId/collect')
