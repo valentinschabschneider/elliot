@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Logger,
+  MessageEvent,
   NotFoundException,
   Param,
   Post,
@@ -137,7 +138,7 @@ export class PrintSoonController {
   })
   async listenJobInfo(
     @Param('jobId') jobId: string,
-  ): Promise<Observable<PrintSoonStatusDto>> {
+  ): Promise<Observable<MessageEvent>> {
     const job = await this.printerQueueService.getPrintJob(jobId);
 
     if (!job) throw new NotFoundException('Job not found');
@@ -160,9 +161,11 @@ export class PrintSoonController {
         ),
       ),
       filter((status): status is PrintSoonStatusDto => status !== null),
-      takeWhile(
-        (status) => status.state !== 'finished' && !status.error,
-        true, // include the final status or error
+      takeWhile((status) => status.state !== 'finished' && !status.error, true),
+      map(
+        (status): MessageEvent => ({
+          data: status,
+        }),
       ),
     );
   }
