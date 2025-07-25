@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   pagedjs-cli@0.4.3:
-    hash: ef04a7bd8ceb9c3af4fe26bbb9d85a51a95a774ccefa7e55e5bee6f8b555c825
+    hash: 5fa05a73105b0034fb251a5d83dd6683df823075697dc046f2b05c9d1fb2755a
     path: patches/pagedjs-cli@0.4.3.patch
 
 importers:
@@ -78,7 +78,7 @@ importers:
         version: 1.2.5
       pagedjs-cli:
         specifier: ^0.4.3
-        version: 0.4.3(patch_hash=ef04a7bd8ceb9c3af4fe26bbb9d85a51a95a774ccefa7e55e5bee6f8b555c825)(typescript@5.8.3)
+        version: 0.4.3(patch_hash=5fa05a73105b0034fb251a5d83dd6683df823075697dc046f2b05c9d1fb2755a)(typescript@5.8.3)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -7990,7 +7990,7 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  pagedjs-cli@0.4.3(patch_hash=ef04a7bd8ceb9c3af4fe26bbb9d85a51a95a774ccefa7e55e5bee6f8b555c825)(typescript@5.8.3):
+  pagedjs-cli@0.4.3(patch_hash=5fa05a73105b0034fb251a5d83dd6683df823075697dc046f2b05c9d1fb2755a)(typescript@5.8.3):
     dependencies:
       commander: 11.1.0
       express: 4.21.2
