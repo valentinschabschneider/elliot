@@ -53,14 +53,17 @@ export class PagedJsService {
 
     printerOptions.extraHTTPHeaders = [
       ...(printerOptions.extraHTTPHeaders ?? []),
-      ...this.configService.get<string[]>('httpHeaders'),
-    ].reduce((acc, header) => {
-      const [name, value] = header.split(':').map((s) => s.trim());
-      if (name && value) {
-        acc[name] = value;
-      }
-      return acc;
-    });
+      ...((this.configService.get<string[]>('httpHeaders') ?? []) as string[]),
+    ].reduce(
+      (acc, header) => {
+        const [name, value] = header.split(':').map((s: string) => s.trim());
+        if (name && value) {
+          acc[name] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
 
     if (printerOptions.extraHTTPHeaders.length > 0) {
       this.logger.log(
@@ -68,6 +71,10 @@ export class PagedJsService {
           JSON.stringify(printerOptions.extraHTTPHeaders),
       );
     }
+
+    printerOptions.extraCookies = printerOptions.extraCookies.map((cookie) =>
+      cookie.toPuppeteerCookie(),
+    );
 
     const printer = new this.CPrinter(printerOptions);
 

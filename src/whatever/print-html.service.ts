@@ -42,7 +42,7 @@ export class PrintHtmlService implements IPrintService {
           closeAfter: false,
           disableScriptInjection: !injectPolyfill,
           extraHTTPHeaders: httpHeaders,
-          extraCookies: cookies.map((cookie) => cookie.toPuppeteerCookie()),
+          extraCookies: cookies,
         },
         currentStepCallback,
       ),
