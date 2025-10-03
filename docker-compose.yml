@@ -5,7 +5,7 @@ services:
     environment:
       NODE_ENV: development
       REDIS_URL: redis://redis:6379
-      BROWSERLESS_ENDPOINT: ws://browserless:3000/chrome
+      BROWSERLESS_ENDPOINT: ws://browserless:3000/chromium
       ENABLE_DASHBOARDS: true
     ports:
       - 3000:3000
@@ -17,4 +17,4 @@ services:
     image: redis:7.4-alpine
 
   browserless:
-    image: ghcr.io/browserless/chrome:v2.31.0
+    image: ghcr.io/browserless/chromium:v2.31.0

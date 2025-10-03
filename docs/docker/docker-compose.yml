@@ -8,7 +8,7 @@ services:
       ADDITIONAL_SCRIPTS: ${ADDITIONAL_SCRIPTS}
       API_KEY: ${API_KEY}
       REDIS_URL: redis://redis:6379
-      BROWSERLESS_ENDPOINT: ws://browserless:3000/chrome?token=${BROWSERLESS_TOKEN}
+      BROWSERLESS_ENDPOINT: ws://browserless:3000/chromium?token=${BROWSERLESS_TOKEN}
       BULL_BOARD_PASSWORD: ${BULL_BOARD_PASSWORD}
     ports:
       - 3000:3000
@@ -24,7 +24,7 @@ services:
     restart: unless-stopped
 
   browserless:
-    image: ghcr.io/browserless/chrome:v2.31.0
+    image: ghcr.io/browserless/chromium:v2.31.0
     environment:
       MAX_CONCURRENT_SESSIONS: 10
       CONNECTION_TIMEOUT: 60000
