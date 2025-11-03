@@ -55,7 +55,7 @@ export class PagedJsService {
     printerOptions.timeout = timeout !== Infinity ? timeout : undefined;
 
     printerOptions.debug =
-      printerOptions.debug ?? this.configService.get('debug') == 'true'; // doesn't just return boolean for some reason
+      printerOptions.debug ?? this.configService.get('debug');
 
     printerOptions.additionalScripts = [
       ...(printerOptions.additionalScripts ?? []),
