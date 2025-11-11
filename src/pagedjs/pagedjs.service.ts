@@ -69,21 +69,12 @@ export class PagedJsService {
       );
     }
 
-    printerOptions.extraHTTPHeaders = [
-      ...(printerOptions.extraHTTPHeaders ?? []),
-      ...((this.configService.get<string[]>('httpHeaders') ?? []) as string[]),
-    ].reduce(
-      (acc, header) => {
-        const [name, value] = header.split(':').map((s: string) => s.trim());
-        if (name && value) {
-          acc[name] = value;
-        }
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
+    printerOptions.extraHTTPHeaders = {
+      ...(this.configService.get('httpHeaders') || {}),
+      ...(printerOptions.extraHTTPHeaders || {}),
+    };
 
-    if (printerOptions.extraHTTPHeaders.length > 0) {
+    if (Object.keys(printerOptions.extraHTTPHeaders).length > 0) {
       this.logger.log(
         'Will add http headers: ' +
           JSON.stringify(printerOptions.extraHTTPHeaders),

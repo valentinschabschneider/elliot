@@ -33,19 +33,19 @@ Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of
 
 ### Environment variables
 
-| Name                        | Description                                                                                          | Default |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- | ------- |
-| REDIS_URL                   | Used for queue management. If not set, print soon feature is unavailable.                            |         |
-| API_KEY                     | Highly recomended if not run in a private network.                                                   |         |
-| BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                         |         |
-| MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached. | 10000   |
-| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds if not cleaned up on collect.             | 3600000 |
-| ADDITIONAL_SCRIPTS          | Additional js code that will be run in every print. Very useful for handlers.                        | []      |
-| HTTP_HEADERS                | HTTP headers that will be set on the get request for the page to be printed.                         | []      |
-| CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                           | false   |
-| ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                          | false   |
-| DEBUG                       | This is passed to pagedjs-cli.                                                                       | false   |
-| BULL_BOARD_PASSWORD         | Basic-Auth password for the queues dashboard                                                         |         |
+| Name                        | Description                                                                                                          | Default |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------- |
+| REDIS_URL                   | Used for queue management. If not set, print soon feature is unavailable.                                            |         |
+| API_KEY                     | Highly recomended if not run in a private network.                                                                   |         |
+| BROWSERLESS_ENDPOINT        | Not strictly required but it will not work without it with the docker image.                                         |         |
+| MAX_TIMEOUT                 | Maximum amount of miliseconds that the generation should last. Will cancel the request when reached.                 | 10000   |
+| PERSIST_PERIOD              | How long the job result should be persisted in miliseconds if not cleaned up on collect.                             | 3600000 |
+| ADDITIONAL_SCRIPTS          | Additional js code that will be run in every print. Very useful for handlers.                                        | []      |
+| HTTP_HEADERS                | HTTP headers that will be set on the get request for the page to be printed. Example: {"test":"true", "test2":"0.5"} | {}      |
+| CLEANUP_JOB_AFTER_COLLECTED | Clean up the job data after the result has been collected.                                                           | false   |
+| ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                                          | false   |
+| DEBUG                       | This is passed to pagedjs-cli.                                                                                       | false   |
+| BULL_BOARD_PASSWORD         | Basic-Auth password for the queues dashboard                                                                         |         |
 
 ## General info
 

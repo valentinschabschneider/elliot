@@ -10,9 +10,9 @@ export default () => {
     additionalScripts: get('ADDITIONAL_SCRIPTS')
       .default('[]')
       .asJsonArray() as string[],
-    httpHeaders: get('HTTP_HEADERS').default('[]').asJsonArray() as Record<
+    httpHeaders: get('HTTP_HEADERS').default('{}').asJsonObject() as Record<
       string,
       string
-    >[],
+    >,
   };
 };

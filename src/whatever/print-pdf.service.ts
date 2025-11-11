@@ -18,7 +18,7 @@ export class PrintPdfService implements IPrintService {
     additionalScripts: string[],
     timeout: number,
     injectPolyfill: boolean,
-    httpHeaders: Record<string, string>[],
+    httpHeaders: Record<string, string>,
     cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
   ): Promise<Array<number>> {

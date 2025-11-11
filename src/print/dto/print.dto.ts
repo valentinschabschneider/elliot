@@ -5,24 +5,12 @@ import {
   IsBoolean,
   IsDate,
   IsNumber,
+  IsObject,
   IsOptional,
   IsPositive,
   IsString,
 } from 'class-validator';
 import { PrintOutputType } from '../../whatever/print-output-type.enum';
-
-function parseCookieString(cookieStr: string) {
-  const parts = cookieStr.split(';').map((part) => part.trim());
-  const cookieObj = {};
-
-  for (const part of parts) {
-    const [key, ...valParts] = part.split('=');
-    const value = valParts.length > 0 ? valParts.join('=') : true; // flags like Secure
-    cookieObj[key] = value;
-  }
-
-  return cookieObj;
-}
 
 export class CookieDto {
   constructor(cookieString?: string) {
@@ -164,7 +152,7 @@ export class PrintDto {
     default: true,
   })
   injectPolyfill: boolean = true;
-  @IsArray()
+  @IsObject()
   @Transform(({ value }) => {
     const headers: string[] = Array.isArray(value)
       ? value
@@ -174,16 +162,16 @@ export class PrintDto {
 
     return headers.reduce((acc, header) => {
       const [name, ...value] = header.split(':');
-      return [...acc, { [name]: value.join(':') }];
-    }, []);
+      return { ...acc, [name.trim()]: value.join(':').trim() };
+    }, {});
   })
   @IsOptional()
   @Expose({ name: 'httpHeader' })
   @ApiPropertyOptional({
-    description: 'HTTP header to pass through.',
-    default: [],
+    description: 'HTTP header to pass through. Example: "test:true"',
+    default: {},
   })
-  httpHeaders?: Record<string, string>[];
+  httpHeaders?: Record<string, string>;
   @IsArray()
   @Transform(({ value }) => {
     const cookieStrings = Array.isArray(value)
@@ -197,7 +185,8 @@ export class PrintDto {
   @IsOptional()
   @Expose({ name: 'cookie' })
   @ApiPropertyOptional({
-    description: 'Cookies to pass through.',
+    description:
+      'Cookies to pass through. Example: "sessionId=abc123; Path=/; Domain=example.com; Expires=Wed, 21 Oct 2025 07:28:00 GMT; Max-Age=3600; Secure; HttpOnly; SameSite=Strict"',
     default: [],
   })
   cookies?: CookieDto[];

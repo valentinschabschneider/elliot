@@ -8,7 +8,7 @@ export interface PrintOptions {
   additionalScripts: string[];
   timeout: number;
   injectPolyfill: boolean;
-  httpHeaders: Record<string, string>[];
+  httpHeaders: Record<string, string>;
   cookies: CookieDto[];
   callbackUrl?: string | undefined;
 }
