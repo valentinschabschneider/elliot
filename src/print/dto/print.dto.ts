@@ -190,4 +190,11 @@ export class PrintDto {
     default: [],
   })
   cookies?: CookieDto[];
+  @Type(() => Number)
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Compress the output.',
+    default: 0,
+  })
+  compressionLevel?: number = 0;
 }

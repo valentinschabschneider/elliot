@@ -1,6 +1,7 @@
 onlyBuiltDependencies:
   - '@nestjs/core'
   - '@scarf/scarf'
+  - compress-pdf
   - core-js
   - es5-ext
   - msgpackr-extract

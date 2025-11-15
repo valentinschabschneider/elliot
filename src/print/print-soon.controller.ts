@@ -78,6 +78,7 @@ export class PrintSoonController {
       httpHeaders,
       cookies,
       callbackUrl,
+      compressionLevel,
     }: PrintUrlCallbackOptionalDto,
     @Body() html?: string,
   ): Promise<PrintSoonCreateDto> {
@@ -108,6 +109,7 @@ export class PrintSoonController {
         httpHeaders,
         cookies,
         callbackUrl,
+        compressionLevel,
       },
       PRIORITY,
     );

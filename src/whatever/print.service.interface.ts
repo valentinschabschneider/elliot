@@ -11,6 +11,7 @@ export interface IPrintService {
     httpHeaders: Record<string, string>,
     cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
+    compressionLevel: number,
   ): Promise<any>;
   createResponse(data: any, response: Response): any;
 }

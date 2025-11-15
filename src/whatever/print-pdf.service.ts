@@ -1,6 +1,8 @@
 import { Injectable, Logger, StreamableFile } from '@nestjs/common';
+import { compress as compressPDF, Resolution } from 'compress-pdf';
 import { Response } from 'express';
 
+import { ConfigService } from '@nestjs/config';
 import { PagedJsService } from '../pagedjs/pagedjs.service';
 import { PrintStep } from '../pagedjs/print-step.enum';
 import { CookieDto } from '../print/dto/print.dto';
@@ -11,7 +13,10 @@ import { IPrintService } from './print.service.interface';
 export class PrintPdfService implements IPrintService {
   private readonly logger = new Logger(PrintPdfService.name);
 
-  constructor(private readonly pagedjsService: PagedJsService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly pagedjsService: PagedJsService,
+  ) {}
 
   public async print(
     input: PrintInput,
@@ -21,8 +26,9 @@ export class PrintPdfService implements IPrintService {
     httpHeaders: Record<string, string>,
     cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
+    compressionLevel: number,
   ): Promise<Array<number>> {
-    const file = await this.pagedjsService.printPdf(
+    let file = await this.pagedjsService.printPdf(
       input,
       this.pagedjsService.createPrinter(
         {
@@ -37,6 +43,41 @@ export class PrintPdfService implements IPrintService {
       ),
       currentStepCallback,
     );
+
+    if (
+      compressionLevel > 0 ||
+      this.configService.get<number>('compressionLevel') > 0
+    ) {
+      currentStepCallback(PrintStep.COMPRESSING);
+
+      let resolution: Resolution;
+      switch (compressionLevel) {
+        case 1:
+          resolution = 'default';
+          break;
+        case 2:
+          resolution = 'prepress';
+          break;
+        case 3:
+          resolution = 'printer';
+          break;
+        case 4:
+          resolution = 'ebook';
+          break;
+        case 5:
+          resolution = 'screen';
+          break;
+        default:
+          resolution = 'default';
+          break;
+      }
+
+      file = await compressPDF(Buffer.from(file), {
+        resolution,
+      });
+
+      this.logger.log('Compressed');
+    }
 
     return Array.from(file);
   }

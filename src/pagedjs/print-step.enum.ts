@@ -3,4 +3,5 @@ export enum PrintStep {
   RENDERING = 'rendering',
   GENERATING = 'generating',
   POST_PROCESSING = 'postprocessing',
+  COMPRESSING = 'compressing',
 }

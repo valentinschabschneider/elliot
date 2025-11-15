@@ -1,6 +1,6 @@
 services:
   elliot:
-    image: valentinschabschneider/elliot
+    image: valentinschabschneider/elliot:compression-test
     build: .
     environment:
       NODE_ENV: development
@@ -18,3 +18,5 @@ services:
 
   browserless:
     image: ghcr.io/browserless/chromium:v2.31.0
+    ports:
+      - 4000:3000

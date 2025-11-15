@@ -1,4 +1,4 @@
-FROM node:24-alpine AS base
+FROM node:24-bookworm-slim AS base
 
 WORKDIR /usr/src/app
 
@@ -13,6 +13,9 @@ FROM base AS prod-deps
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 RUN --mount=type=cache,id=s/a9650354-4631-43f2-a069-a098c18071b9-pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+
+RUN apt-get update \
+    && apt-get install -y wget
 
 RUN wget https://gobinaries.com/tj/node-prune --output-document - | /bin/sh && node-prune
 
@@ -29,12 +32,15 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN --mount=type=cache,id=s/a9650354-4631-43f2-a069-a098c18071b9-pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-FROM gcr.io/distroless/nodejs24-debian12 AS deploy
+FROM node:24-slim AS deploy
 
 WORKDIR /usr/src/app
 
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
+
+RUN apt-get update \
+    && apt-get install -y ghostscript
 
 ENV NODE_ENV=production
 

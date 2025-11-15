@@ -11,4 +11,5 @@ export interface PrintOptions {
   httpHeaders: Record<string, string>;
   cookies: CookieDto[];
   callbackUrl?: string | undefined;
+  compressionLevel: number;
 }

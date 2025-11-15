@@ -40,6 +40,7 @@ export class PrinterQueueConsumer {
       job.data.httpHeaders,
       job.data.cookies,
       async (step: PrintStep) => await job.progress(step.toString()),
+      job.data.compressionLevel,
     );
 
     return { data, outputType: job.data.outputType };

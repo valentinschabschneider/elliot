@@ -26,8 +26,15 @@ export class PrintHtmlService implements IPrintService {
     httpHeaders: Record<string, string>,
     cookies: CookieDto[],
     currentStepCallback: (step: PrintStep) => void,
+    compressionLevel: number,
   ): Promise<string> {
     const preview = true;
+
+    if (compressionLevel > 0) {
+      this.logger.warn(
+        'HTML compression is not supported and will be ignored.',
+      );
+    }
 
     return this.pagedjsService.generateHTML(
       input,

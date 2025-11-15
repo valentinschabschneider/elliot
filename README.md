@@ -46,6 +46,7 @@ Elliot is able to output PDF's and HTML. The HTML output is a kind of preview of
 | ENABLE_DASHBOARDS           | Enable the `/api` and `/bull-board` routes.                                                                          | false   |
 | DEBUG                       | This is passed to pagedjs-cli.                                                                                       | false   |
 | BULL_BOARD_PASSWORD         | Basic-Auth password for the queues dashboard                                                                         |         |
+| COMPRESSION_LEVEL           | Compression level for the generated PDF file. Between 0 (no compression) and 5 (maximum compression)                 | 0       |
 
 ## General info
 

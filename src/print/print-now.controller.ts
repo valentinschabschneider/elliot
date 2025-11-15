@@ -57,6 +57,7 @@ export class PrintNowController {
       injectPolyfill,
       httpHeaders,
       cookies,
+      compressionLevel,
     }: PrintDto,
     @Body() html: string,
   ): Promise<StreamableFile | string> {
@@ -84,6 +85,7 @@ export class PrintNowController {
           injectPolyfill,
           httpHeaders,
           cookies,
+          compressionLevel,
         },
         PRIORITY,
       );
@@ -112,6 +114,7 @@ export class PrintNowController {
         httpHeaders,
         cookies,
         async (_) => null,
+        compressionLevel,
       );
 
       return this.collectService.buildCollectResponse(
