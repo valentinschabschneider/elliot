@@ -74,6 +74,7 @@ export class PrintPdfService implements IPrintService {
 
       file = await compressPDF(Buffer.from(file), {
         resolution,
+        imageQuality: null,
       });
 
       this.logger.log('Compressed');
